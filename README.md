@@ -1,0 +1,2 @@
+# AllregoSoft.WebManagementSystem
+
