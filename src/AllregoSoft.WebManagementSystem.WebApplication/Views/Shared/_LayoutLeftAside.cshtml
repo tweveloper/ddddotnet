@@ -1,0 +1,87 @@
+﻿@using Newtonsoft.Json.Linq
+
+<aside class="page-sidebar">
+    <div class="page-logo">
+        <a href="/Home" class="page-logo-link press-scale-down d-flex align-items-center position-relative">
+            <span class="page-logo-text mr-1">통합 Admin</span>
+            <span class="position-absolute text-white opacity-50 small pos-top pos-right mr-2 mt-n2"></span>
+        </a>
+    </div>
+    <!-- BEGIN PRIMARY NAVIGATION -->
+    <nav id="js-primary-nav" class="primary-nav" role="navigation">
+        <ul id="js-nav-menu" class="nav-menu">
+            @*@if (TempData["SiteMap"] != null)
+            {
+                foreach (var FirstMap in TempData["SiteMap"] as JArray)
+                {
+                    <li class="@(FirstMap["ParentMap"]["Active"].ToString() == "true" ? "active open" : "")">
+                        <a href="#" title="@FirstMap["ParentMap"]["Name"]" @(FirstMap["ParentMap"]["Active"].ToString() == "true" ? "aria-expanded=true" : "")>
+                            <i class="fal fa-info-circle"></i>
+                            <span class="nav-link-text">@FirstMap["ParentMap"]["Name"]</span>
+                        </a>
+                        <ul>
+                            @foreach (var SecondMap in FirstMap["SecondMaps"])
+                            {
+                                <li class="@(SecondMap["Active"].ToString() == "true" ? "active" : "")">
+                                    <a href="@SecondMap["Path"]" title="@SecondMap["Name"]" id="@SecondMap["Id"]">
+                                        <span class="nav-link-text">@SecondMap["Name"]</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                }
+                //TempData["SiteMap"] 데이터 유지
+                //TempData.Keep("SiteMap");
+                TempData.Keep();
+            }*@
+            @if (TempData["SiteMap"] != null) {
+                foreach (var FirstMap in TempData["SiteMap"] as JArray) {
+                    <li class="@(FirstMap["ParentMap"]["Active"].ToString() == "true" ? "active open" : "")">
+                        <a href="#" title="@FirstMap["ParentMap"]["Name"]" @(FirstMap["ParentMap"]["Active"].ToString() == "true" ? "aria-expanded=true" : "")>
+                            @*<i class="fal fa-info-circle"></i>*@
+                            <span class="nav-link-text">@FirstMap["ParentMap"]["Name"]</span>
+                        </a>
+                        <ul>
+                            @foreach (var SecondMap in FirstMap["SecondMaps"])
+                            {
+                                @if (SecondMap["ThirdMaps"].Count() > 0)
+                                {
+                                    <li class="@(SecondMap["Active"].ToString() == "true" ? "active open" : "")">
+                                        <a href="#" title="@SecondMap["Name"]" @(SecondMap["Active"].ToString() == "true" ? "aria-expanded=true" : "")>
+                                            @*<i class="fal fa-info-circle"></i>*@
+                                            <span class="nav-link-text">@SecondMap["Name"]</span>
+                                        </a>
+                                        <ul>
+                                            @foreach (var ThirdMap in SecondMap["ThirdMaps"])
+                                            {
+                                                <li class="@(ThirdMap["Active"].ToString() == "true" ? "active" : "")">
+                                                    <a href="@ThirdMap["Path"]" title="@ThirdMap["Name"]" id="@ThirdMap["Id"]">
+                                                        <span class="nav-link-text">@ThirdMap["Name"]</span>
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li @(SecondMap["Active"].ToString() == "true" ? "class=active" : "")>
+                                        <a href="@SecondMap["Path"]" title="@SecondMap["Name"]" id="@SecondMap["Id"]">
+                                            @*<i class="fal fa-info-circle"></i>*@
+                                            <span class="nav-link-text">@SecondMap["Name"]</span>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </li>
+                }
+                //TempData["SiteMap"] 데이터 유지
+                //TempData.Keep("SiteMap");
+                TempData.Keep();
+            }
+        </ul>
+    </nav>
+    <!-- END PRIMARY NAVIGATION -->
+</aside>

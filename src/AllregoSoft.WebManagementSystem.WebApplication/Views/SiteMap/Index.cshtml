@@ -1,0 +1,418 @@
+﻿@{
+    ViewData["Title"] = "메뉴관리";
+}
+@section css{
+    <link rel="stylesheet" media="screen, print" href="~/bootstrap/css/fa-brands.css" />
+    <link rel="stylesheet" media="screen, print" href="~/bootstrap/css/formplugins/select2/select2.bundle.css" />
+    <link rel="stylesheet" media="screen, print" href="~/bootstrap/css/datagrid/datatables/datatables.bundle.css">
+    <link rel="stylesheet" type="text/css" href="~/bootstrap/css/jstree-bootstrap-theme/jstree-style.css" />
+}
+@section scripts{
+    <script type="text/javascript" src="~/bootstrap/js/datagrid/datatables/datatables.bundle.js"></script>
+    <script type="text/javascript" src="~/bootstrap/js/jstree-js/jstree.js"></script>
+    <script>
+    $(document).ready(function () {
+        //메뉴 호출 API
+        fetch('@Startup.appSettings["ApiDomain"]/SiteMap/SiteMapList',
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json;'
+                }
+            })
+            .then(response => response.json())
+            .then(function (data) {
+                var sitemap = new Array();
+
+                $.each(data, function (idx, item) {
+                    sitemap[idx] = { id: item.Id, parent: item.Parent, text: item.Name, position: item.Position }
+                });
+                $('#tree').jstree({
+                    'plugins': ['wholerow', 'dnd', 'contextmenu', 'types'],
+                    'core': {
+                        'data': sitemap,
+                        'themes': {
+                            'name': 'proton',
+                            'responsive': true
+                        },
+                        'check_callback': true
+                    },
+                    'types': {
+                        '#': {
+                            'max_depth': 3
+                        }
+                    },
+                    'contextmenu': {
+                        'items': function (node) {
+                            return {
+                                @if (TempData["C"].ToString() != "Y")
+                                {
+                                    @:'create': false,
+                                }
+                                else
+                                {
+                                    <text>
+                                'create': {
+                                    'separator_before': false,
+                                    'separator_after': true,
+                                    'label': 'Create',
+                                    'action': function (obj) { $("#tree").jstree(true).create_node(node); }
+                                },
+                                    </text>
+                                }
+                                @if (TempData["U"].ToString() != "Y")
+                                {
+                                    @:'rename': false,
+                                }
+                                else
+                                {
+                                    <text>
+                                'rename': {
+                                    'separator_before': false,
+                                    'separator_after': true,
+                                    'label': 'Rename',
+                                    'action': function (obj) { $("#tree").jstree(true).edit(node); }
+                                },
+                                    </text>
+                                }
+                                @if (TempData["D"].ToString() != "Y")
+                                {
+                                    @:'remove': false,
+                                }
+                                else
+                                {
+                                    <text>
+                                'remove': {
+                                    'separator_before': false,
+                                    'separator_after': true,
+                                    'label': 'Delete',
+                                    'action': function (obj) { $("#tree").jstree(true).delete_node(node); }
+                                },
+                                    </text>
+                                }
+                                'ccp': false
+                            };
+                        }
+                    }
+                }).on('loaded.jstree', function (e, data) {
+                    $('#tree').jstree('open_all');
+                }).on('select_node.jstree', function (e, data) {
+                    if (!isNaN(data.selected[0])) {
+                        $.ajax({
+                            url: '@Startup.appSettings["ApiDomain"]/SiteMap/SiteMapInfo',
+                            type: 'GET',
+                            dataType: 'json',
+                            contentType: 'application/json; charset=UTF-8',
+                            data: { Id: data.selected[0] },
+                            success: function (data) {
+                                if (data.Depth == 1) {
+                                    $('#path').attr('readonly', true);
+                                    $('#description').attr('readonly', true);
+                                } else {
+                                    $('#path').attr('readonly', false);
+                                    $('#description').attr('readonly', false);
+                                }
+                                $('#Id').val(data.Id);
+                                $('#name').val(data.Name);
+                                $('#path').val(data.Path);
+                                $('#active').prop('checked', data.Active);
+                                $('#description').val(data.Description);
+                            },
+                            error: function (request, status, error) {
+                                var msg = 'ERROR<br><br>' + request.status + '<br>' + request.responseText + '<br>' + error;
+                                console.log(msg);
+                            }
+                        });
+                    } else {
+                        Swal.fire('고유번호가 필요합니다.');
+                    }
+                @if (TempData["U"].ToString() == "Y")
+                {
+                    <text>
+                    }).on('rename_node.jstree', function (e, data) {
+                        //추가 or 업데이트
+                        var jsonnode = $.extend({ 'id': data.node.id }, { 'name': data.node.text }, { 'parent': data.node.parent }, { 'depth': data.node.parents.length });
+                        var jsondata = JSON.stringify(jsonnode);
+
+                        fetch('@Startup.appSettings["ApiDomain"]/SiteMap/AddOrUpdate',
+                        {
+                            method: 'POST',
+                            body: jsondata,
+                            headers: {
+                                'Content-Type': 'application/json;'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(function (data) {
+                            if (data.result == 'true') {
+                                Swal.fire('저장에 성공했습니다.');
+                            } else {
+                                Swal.fire('저장에 실패했습니다.');
+                            }
+                            //setTimeout(function () { location.reload(); }, 500);
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }).on('move_node.jstree', function (e, data) {
+                        //순서 변경
+                        var jsonnode = $.extend({ 'id': data.node.id },
+                            { 'parent': data.node.parent },
+                            { 'old_parent': data.old_parent },
+                            { 'new_position': (data.position + 1) },
+                            { 'depth': data.node.parents.length }
+                        );
+                        var jsondata = JSON.stringify(jsonnode);
+
+                        fetch('@Startup.appSettings["ApiDomain"]/SiteMap/ChangePosition',
+                        {
+                            method: 'POST',
+                            body: jsondata,
+                            headers: {
+                                'Content-Type': 'application/json;'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(function (data) {
+                            if (data.result == 'true') {
+                                Swal.fire('저장에 성공했습니다.');
+                            } else {
+                                Swal.fire('저장에 실패했습니다.');
+                            }
+                            //setTimeout(function () { location.reload(); }, 500);
+                        })
+                        .catch(error => console.error('Error:', error));
+                    </text>
+                }
+                @if (TempData["D"].ToString() == "Y")
+                {
+                    <text>
+                    }).on('delete_node.jstree', function (e, data) {
+                        var jsonnode = { 'id': data.node.id };
+                        var jsondata = JSON.stringify(jsonnode);
+
+                        fetch('@Startup.appSettings["ApiDomain"]/SiteMap/Delete',
+                        {
+                            method: 'POST',
+                            body: jsondata,
+                            headers: {
+                                'Content-Type': 'application/json;'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(function (data) {
+                            //console.log(data);
+                            if (data.result == 'true') {
+                                Swal.fire('저장에 성공했습니다.');
+                            } else {
+                                Swal.fire('저장에 실패했습니다.');
+                            }
+                            //setTimeout(function () { location.reload(); }, 500);
+                        })
+                        .catch(error => console.error('Error:', error));
+                    </text>
+                }
+                @if (TempData["C"].ToString() == "Y") { 
+                    <text>
+                    }).on('create_node.jstree', function (e, data) {
+                        //console.log(data);
+                        var jsonnode = $.extend({ 'id': data.node.id }, { 'name': data.node.text }, { 'parent': data.node.parent }, { 'depth': data.node.parents.length });
+                        var jsondata = JSON.stringify(jsonnode);
+                        console.log(jsondata);
+
+                        fetch('@Startup.appSettings["ApiDomain"]/SiteMap/AddOrUpdate',
+                        {
+                            method: 'POST',
+                            body: jsondata,
+                            headers: {
+                                'Content-Type': 'application/json;'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(function (data) {
+                            if (data.result == 'true') {
+                                Swal.fire('저장에 성공했습니다.');
+                            } else {
+                                Swal.fire('저장에 실패했습니다.');
+                            }
+                            //setTimeout(function () { location.reload(); }, 500);
+                        })
+                        .catch(error => console.error('Error:', error));
+                    </text>
+                }
+                });
+        })
+        .catch(error => console.error('Error:', error));
+        //$.jstree.defaults.dnd.large_drag_target;
+        //최상위 노드 추가
+        @if (TempData["C"].ToString() == "Y")
+        {
+            <text>
+            $('#AddRootbtn').click(function () {
+                $('#tree').jstree().create_node(null, null, 'last', function (node) {
+                    var data = JSON.stringify(node);
+                    //console.log(node);
+
+                    fetch('@Startup.appSettings["ApiDomain"]/SiteMap/AddRootNode',
+                    {
+                        method: 'POST',
+                        body: data,
+                        headers: {
+                            'Content-Type': 'application/json;'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(function (data) {
+                        //console.log(data);
+                        if (data.result == 'true') {
+                            Swal.fire('저장에 성공했습니다.');
+                        } else {
+                            Swal.fire('저장에 실패했습니다.');
+                        }
+                        //setTimeout(function () { location.reload(); }, 500);
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+            </text>
+        }
+        //메뉴상세 정보 저장
+        @if (TempData["U"].ToString() == "Y")
+        {
+            <text>
+            $('#savebtn').click(function (event) {
+                var valiElement = $('#js-site')
+
+                if (valiElement[0].checkValidity() === false) {//validation 실패
+                    event.preventDefault()
+                    event.stopPropagation()
+                } else {//validation 성공
+                    SiteMapInfoSend();
+                }
+
+                valiElement.addClass('was-validated');
+
+                return false;
+            });
+            </text>
+        }
+
+        @if (TempData["D"].ToString() == "Y")
+        {
+            <text>
+            $('#deletebtn').click(function (event) {
+                $('#tree').jstree(true).delete_node($('#Id').val());
+            });
+            </text>
+        }
+    });
+
+    function SiteMapInfoSend() {
+        //메뉴상세 정보 저장 API
+        //fromData To JSON
+        var form = document.getElementById('js-site');
+
+        var object = { };
+        var formData = new FormData(form);
+        formData.forEach(function(value, key) {
+            object[key] = value;
+        });
+        object['active'] = $('#active').is (':checked');
+        var data = JSON.stringify(object);
+
+        //노드정보 저장 API
+        fetch('@Startup.appSettings["ApiDomain"]/SiteMap/SiteMapInfo',
+        {
+            method: 'POST',
+            body: data,
+            headers: {
+                'Content-Type': 'application/json;'
+            }
+        })
+        .then(response => response.json())
+        .then(function (data) {
+            //console.log(data);
+
+            if (data.result == 'true') {
+                Swal.fire('저장에 성공했습니다.');
+            $('#tree').jstree(true).refresh();
+            } else {
+                Swal.fire('저장에 실패했습니다.');
+                console.log(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    </script>
+}
+
+<div class="row">
+    <div class="col-xl-6">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2>
+                    <span>메뉴관리</span>
+                </h2>
+            </div>
+            <div class="col-xl-12 ml-auto mr-auto mb-3 mt-3">
+                <div class="card p-4 rounded-plus bg-faded">
+                    <div id="tree"></div>
+                    @if (TempData["C"].ToString() == "Y")
+                    {
+                        <div class="row no-gutters">
+                            <div class="col-md-4 text-left">
+                                <button id="AddRootbtn" type="submit" class="btn btn-info btn-sm mt-3"><i class="fal fa-plus mr-1"></i>최상위 노드 추가</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div id="panel-2" class="panel">
+            <div class="panel-hdr">
+                <h2>
+                    <span>메뉴 정보</span>
+                </h2>
+            </div>
+            <div class="col-xl-12 ml-auto mr-auto mb-3 mt-3">
+                <div class="card p-4 rounded-plus bg-faded">
+                    <form id="js-site" novalidate="">
+                        <input type="hidden" id="Id" name="Id" data-Id="" />
+                        <div class="form-group">
+                            <label class="form-label" for="name">명칭</label>
+                            <input type="text" id="name" name="name" class="form-control" placeholder="명칭" value="" readonly required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="path">경로</label>
+                            <input type="text" id="path" name="path" class="form-control" placeholder="경로" value="" required>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="active">
+                                    <label class="custom-control-label" for="active">활성화</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="description">설명</label>
+                            <textarea class="form-control fs-xl" rows="4" id="description" name="description" placeholder="설명"></textarea>
+                        </div>
+                        <div class="row no-gutters">
+                            <div class="col-md-4 text-left">
+                                @if (TempData["U"].ToString() == "Y")
+                                {
+                                    <button id="savebtn" type="submit" class="btn btn-info btn-sm mt-3">저장</button>
+                                }
+                                @if (TempData["D"].ToString() == "Y")
+                                {
+                                    <button id="deletebtn" type="submit" class="btn btn-info btn-sm mt-3">삭제</button>
+                                }
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

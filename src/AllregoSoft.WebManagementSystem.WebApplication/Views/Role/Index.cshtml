@@ -1,0 +1,421 @@
+﻿@{
+    ViewData["Title"] = "역할관리";
+}
+@section css{
+    <link rel="stylesheet" media="screen, print" href="~/bootstrap/css/fa-brands.css" />
+    <link rel="stylesheet" media="screen, print" href="~/bootstrap/css/formplugins/select2/select2.bundle.css" />
+    <link rel="stylesheet" type="text/css" href="~/bootstrap/css/jstree-bootstrap-theme/jstree-style.css" />
+    <style>
+        .dataTables_filter label {
+            display: flex;
+            float: left;
+        }
+
+        #grid_role_paginate ul.pagination {
+            float: right;
+        }
+    </style>
+}
+
+@section scripts{
+    <script type="text/javascript" src="~/bootstrap/js/datagrid/datatables/datatables.bundle.js"></script>
+    <script type="text/javascript" src="~/bootstrap/js/jstree-js/jstree.js"></script>
+    <script>
+    $(document).ready(function () {
+        //역할리스트 작성
+        dataTableGrid();
+
+        //메뉴트리 작성
+        dataTreeGrid();
+
+        //역할 클릭Event
+        $('#grid_role').on('click', 'tr', function () {
+            setTimeout(function () {
+                var Id = $('#grid_role').DataTable().rows({ selected: true }).data().pluck('Id')[0];
+                $('#Id').val(Id);
+                dataTreeRefresh(Id);
+            }, 50);
+            //$('#Id').val($(this).attr('Id'));
+            //dataTreeRefresh($(this).attr('Id'));
+        });
+
+        //트리 저장Event
+        $('#js-sitemap-btn').click(function (event) {
+            var v = $('#tree1').jstree(true).get_json('#', { 'flat': true });
+            var SiteMapCheck = new Object();
+
+            SiteMapCheck['RoleId'] = $('#grid_role').DataTable().rows({ selected: true }).data().pluck('Id')[0];
+            SiteMapCheck['jstreeMaps'] = v;
+
+            var SiteMapCheckData = JSON.stringify(SiteMapCheck);
+            SiteMapCheckSend(SiteMapCheckData);
+        });
+
+        //crud 트리 저장Event
+        $('#js-crud-btn').click(function (event) {
+            if ($('#form-group input:checkbox[name="chkbx"]:checked').length > 0) {
+                var data = $('#form-group input:checkbox[name="chkbx"]:checked');
+                var SiteMapCheck = new Object();
+                var ids = '';
+
+                $.each(data, function (idx, val) {
+                    ids += val.id + ',';
+                });
+                SiteMapCheck['RoleId'] = $('#grid_role').DataTable().rows({ selected: true }).data().pluck('Id')[0];
+                SiteMapCheck['Ids'] = ids;
+                var SiteMapCheckData = JSON.stringify(SiteMapCheck);
+
+                //CRUD 저장 API
+                fetch('@Startup.appSettings["ApiDomain"]/Role/Role_SiteMap_CRUD',
+                {
+                    method: 'POST',
+                    body: SiteMapCheckData,
+                    headers: {
+                        'Content-Type': 'application/json;'
+                    }
+                })
+                .then(response => response.json())
+                .then(function (data) {
+                    //console.log(data);
+                    if (data.result == 'true') {
+                        Swal.fire('저장에 성공했습니다.');
+                    } else {
+                        Swal.fire('저장에 실패했습니다.');
+                        console.log(data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+            else {
+                Swal.fire('선택된 권한이 없습니다.');
+            }
+        });
+
+        $('#chkall-btn').click(function () {
+            $('#form-group input:checkbox[name="chkbx"]').prop('checked', true);
+        });
+        $('#unchkall-btn').click(function () {
+            $('#form-group input:checkbox[name="chkbx"]:checked').prop('checked', false);
+        });
+    });
+    //역할리스트 작성
+    function dataTableGrid() {
+        $('#grid_role').dataTable({
+            ajax: { url: '@Startup.appSettings["ApiDomain"]/Role/RoleList', dataSrc: '' },
+            columns: [
+                {
+                    title: 'Id',
+                    id: 'Id',
+                    data: 'Id',
+                    placeholderMsg: 'Server Generated ID',
+                    visible: false,
+                    searchable: false,
+                    type: 'readonly'
+                },
+                {
+                    title: 'RoleName',
+                    id: 'Name',
+                    data: 'Name',
+                    type: 'text',
+                    placeholderMsg: '명칭',
+                    unique: true,
+                    required: true,
+                    uniqueMsg: '명칭을 입력하세요.'
+                }
+            ],
+            rowId: 'Id',
+            select: 'single',
+            altEditor: true,
+            responsive: true,
+            language: {
+                'emptyTable': '등록된 정보가 없습니다.'
+            },
+            dom: "<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+                 "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            buttons: [
+                @if (TempData["C"].ToString() == "Y")
+                {
+                    <text>
+                    {
+                        text: '<i class="fal fa-plus mr-1"></i> 추가',
+                        name: 'add',
+                        className: 'btn-success btn-sm mr-1'
+                    },
+                    </text>
+                }
+                @if (TempData["U"].ToString() == "Y")
+                {
+                    <text>
+                    {
+                        extend: 'selected',
+                        text: '<i class="fal fa-edit mr-1"></i> 수정',
+                        name: 'edit',
+                        className: 'btn-primary btn-sm mr-1'
+                    },
+                    </text>
+                }
+                @if (TempData["D"].ToString() == "Y")
+                {
+                    <text>
+                    {
+                        extend: 'selected',
+                        text: '<i class="fal fa-times mr-1"></i> 삭제',
+                        name: 'delete',
+                        className: 'btn-primary btn-sm mr-1',
+                    }
+                    </text>
+                }
+            ],
+            /* default callback for insertion: mock webservice, always success */
+            @if (TempData["C"].ToString() == "Y")
+            {
+                <text>
+                onAddRow: function (dt, rowdata, success, error) {
+                    dataTableAddUpdate('Add', rowdata);
+                    success(rowdata);
+                },
+                </text>
+            }
+            @if (TempData["U"].ToString() == "Y")
+            {
+                <text>
+                onEditRow: function (dt, rowdata, success, error) {
+                    dataTableAddUpdate('Edit', rowdata);
+                    success(rowdata);
+                },
+                </text>
+            }
+            @if (TempData["D"].ToString() == "Y")
+            {
+                <text>
+                onDeleteRow: function (dt, rowdata, success, error) {
+                    dataTableAddUpdate('Del', rowdata);
+                    success(rowdata);
+                }
+                </text>
+            }
+        });
+    }
+    //메뉴트리 작성
+    function dataTreeGrid() {
+        fetch('@Startup.appSettings["ApiDomain"]/Role/Role_SiteMapList',
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json;'
+            }
+        })
+        .then(response => response.json())
+        .then(function (data) {
+            var sitemap = new Array();
+            $.each(data, function (idx, item) {
+                sitemap[idx] = { id: item.Id, parent: item.Parent, text: item.Name, position: item.Position, state: { selected: false } }
+            });
+            $('#tree1').jstree({
+                'plugins': ['wholerow', 'checkbox'],
+                'core': {
+                    'data': sitemap,
+                    'themes': {
+                        'responsive': true,
+                        'name': 'proton'
+                    },
+                    'check_callback': true
+                }
+            });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    //메뉴트리 리로드
+    function dataTreeRefresh(Id) {
+        fetch('@Startup.appSettings["ApiDomain"]/Role/Role_SiteMapList?Id=' + Id,
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json;'
+            }
+        })
+        .then(response => response.json())
+        .then(function (data) {
+            $('#form-group').html('');
+
+            var sitemap = new Array();
+            $.each(data, function (idx, item) {
+                sitemap[idx] = { id: item.Id, parent: item.Parent, text: item.Name, position: item.Position, state: { selected: item.Selected } }
+                //CRUD checkbox 그리기
+                if ((item.Depth == "2" || item.Depth == "3") && item.Selected == true && item.ChildCnt == 0) {
+                    var str = '<div>';
+                    str += '<label>' + item.Name + '</label>&nbsp;';
+                    str += '&nbsp;<input name="chkbx" type="checkbox" id="R_' + item.Id + '" ' + (item.R == 'Y' ? 'checked' : '') + ' /><label for="R_' + item.Id + '">읽기</label>';
+                    str += '&nbsp;<input name="chkbx" type="checkbox" id="C_' + item.Id + '" ' + (item.C == 'Y' ? 'checked' : '') + ' /><label for="C_' + item.Id + '">생성</label>';
+                    str += '&nbsp;<input name="chkbx" type="checkbox" id="U_' + item.Id + '" ' + (item.U == 'Y' ? 'checked' : '') + ' /><label for="U_' + item.Id + '">수정</label>';
+                    str += '&nbsp;<input name="chkbx" type="checkbox" id="D_' + item.Id + '" ' + (item.D == 'Y' ? 'checked' : '') + ' /><label for="D_' + item.Id + '">삭제</label>';
+                    str += '&nbsp;<input name="chkbx" type="checkbox" id="Auth1_' + item.Id + '" ' + (item.Auth1 == 'Y' ? 'checked' : '') + ' /><label for="Auth1_' + item.Id + '">권한1</label>';
+                    str += '&nbsp;<input name="chkbx" type="checkbox" id="Auth2_' + item.Id + '" ' + (item.Auth2 == 'Y' ? 'checked' : '') + ' /><label for="Auth2_' + item.Id + '">권한2</label>';
+                    str += '</div>';
+                    $('#form-group').append(str);
+                    $('#btns').show();
+                }
+            });
+            console.log(sitemap);
+            $('#tree1').jstree(true).settings.core.data = sitemap;//변경확인
+            $('#tree1').jstree('destroy');
+            $('#tree1').jstree({
+                'plugins': ['wholerow', 'checkbox'],
+                'core': {
+                    'data': sitemap,
+                    'themes': {
+                        'name': 'proton',
+                        'responsive': true
+                    },
+                    'check_callback': true
+                }
+            });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function dataTableAddUpdate(type, rowdata) {
+        if (rowdata['Name'] == null || rowdata['Name'] == '') {
+            Swal.fire('명칭을 입력하세요.');
+            dataTableRefresh();
+            return false;
+        }
+        if (type == 'Add') { rowdata['Id'] = '0' }
+        if (type == 'Del') { rowdata['State'] = '1'; } else { rowdata['State'] = '0'; }
+
+        var data = JSON.stringify(rowdata);
+        //Role 정보 저장 API
+        fetch('@Startup.appSettings["ApiDomain"]/Role/Role',
+        {
+            method: 'POST',
+            body: data,
+            headers: {
+                'Content-Type': 'application/json;'
+            }
+        })
+        .then(response => response.json())
+        .then(function (data) {
+            if (data.result == 'true') {
+                dataTableRefresh();
+                Swal.fire('저장에 성공했습니다.');
+            } else {
+                Swal.fire('저장에 실패했습니다.');
+                console.log(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    //역할리스트 리로드
+    function dataTableRefresh() {
+        $('#grid_role').DataTable().destroy();
+        dataTableGrid();
+    }
+    //메뉴트리 설정저장
+    function SiteMapCheckSend(data) {
+        if ($('#grid_role').DataTable().rows({ selected: true }).count() == 0)
+        {
+            Swal.fire('선택된 역할이 없습니다. 역할을 선택해주세요.');
+            return false;
+        }
+        //메뉴설정 저장 API
+        fetch('@Startup.appSettings["ApiDomain"]/Role/Role_SiteMap',
+        {
+            method: 'POST',
+            body: data,
+            headers: {
+                'Content-Type': 'application/json;'
+            }
+        })
+        .then(response => response.json())
+        .then(function (data) {
+            //console.log(data);
+            if (data.result == 'true') {
+                Swal.fire('저장에 성공했습니다.');
+                dataTreeRefresh($('#grid_role').DataTable().rows({ selected: true }).data().pluck('Id')[0]);
+            } else {
+                Swal.fire('저장에 실패했습니다.');
+                console.log(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    </script>
+}
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2>
+                    <span>역할관리</span>
+                </h2>
+            </div>
+            <div class="col-xl-12 ml-auto mr-auto mb-3 mt-3">
+                <div class="card p-4 rounded-plus bg-faded">
+                    <table id="grid_role" class="table table-bordered table-hover table-striped w-100">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>RoleName</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div id="panel-2" class="panel">
+            <div class="panel-hdr">
+                <h2>
+                    <span>권한 정보</span>
+                </h2>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <input type="hidden" id="Id" name="Id" data-Id="" />
+                    <div id="tree1"></div>
+                    @if (TempData["C"].ToString() == "Y" || TempData["U"].ToString() == "Y")
+                    {
+                        <div class="row no-gutters">
+                            <div class="col-md-4 text-left">
+                                <button id="js-sitemap-btn" type="submit" class="btn btn-info btn-sm mt-3">저장</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-xl-12 ml-auto mr-auto mb-3">
+                <div class="panel-tag">
+                    <p>
+                        <code>추가작업 필요내용</code>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div id="panel-2" class="panel">
+            <div class="panel-hdr">
+                <h2>
+                    <span>권한설정</span>
+                </h2>
+            </div>
+            <div class="col-xl-12 ml-auto mr-auto mb-3 mt-3">
+                <div class="card p-4 rounded-plus bg-faded">
+                    <div id="form-group" class="form-group"></div>
+                </div>
+                <div id="btns" class="row no-gutters" style="display:none;">
+                    @if (TempData["C"].ToString() == "Y" || TempData["U"].ToString() == "Y")
+                    {
+                        <div class="col-md-8 text-left">
+                            <button id="chkall-btn" type="submit" class="btn btn-info btn-sm mt-3">전체선택</button>
+                            <button id="unchkall-btn" type="submit" class="btn btn-info btn-sm mt-3">선택해제</button>
+                            <button id="js-crud-btn" type="submit" class="btn btn-info btn-sm mt-3">저장</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,162 @@
+﻿@{
+    ViewData["Title"] = "상품리스트";
+}
+
+@section css{
+    <link rel="stylesheet" media="screen, print" href="~/bootstrap/css/datagrid/datatables/datatables.bundle.css">
+    <style>
+        div.dataTables_info {
+            text-align: center;
+        }
+    </style>
+}
+
+@section scripts{
+    <script type="text/javascript" src="~/bootstrap/js/datagrid/datatables/datatables.bundle.js"></script>
+    <script>
+    $(document).ready(function () {
+        $('#grid_product').DataTable({
+            destroy: true,
+            fixedHeader: true,
+            responsive: true,
+            rowId: 'id',
+            order: [[2, 'desc']],
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            ajax: {
+                url: '@Startup.appSettings["ApiDomain"]/Product/ProductList?id=' + @ViewBag.mall_Id,
+                dataSrc: ''
+            },
+            columns: [
+                { data: "Id", visible: false, searchable: false },
+                { data: "", title: "", className: 'dt-center', visible: true, searchable: false, orderable: false },
+                { data: "goodsNo", className: 'dt-center' },
+                { data: "prdNm", className: 'dt-head-center' },
+                { data: "state", className: 'dt-center' },
+                { data: "salePrice", className: 'dt-head-center dt-body-right' },
+                { data: "regDate", className: 'dt-center' }
+            ],
+            columnDefs: [
+                {
+                    targets: [1],
+                    render: function (data, type, row) {
+                        return '<input type="checkbox" class="form-check-input" id="chkbx_' + row['Id'] + '" />';
+                    }
+                }, {
+                    targets: [2],
+                    render: function (data, type, row) {
+                        return '<a href="http://' + row['Mall_Id'] + '.cafe24.com/product/detail.html?product_no=' + row['ExtendProductId'] + '" target="_blank">' + data + '</a>';
+                    }
+                }
+            ],
+            dom: "<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+                "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-4'i><'col-sm-12 col-md-4'p>>",
+            buttons: [
+                {
+                    text: '전체선택',
+                    className: 'btn-sm btn-success',
+                    action: function (e, dt, node, config) {
+                        //체크박스 사용인 경우
+                        $('input:checkbox').prop('checked', true);
+                        $.each($('input:checkbox:checked'), function (idx, val) {
+                            var id = $(this).attr('id').split('_');
+                            $('#' + id[1]).addClass('selected');
+                        });
+                    }
+                },
+                {
+                    text: '선택해제',
+                    className: 'btn-sm btn-info ',
+                    action: function (e, dt, node, config) {
+                        //체크박스 사용인 경우
+                        $('input:checkbox:checked').prop('checked', false);
+                        $.each($('input:checkbox'), function (idx, val) {
+                            var id = $(this).attr('id').split('_');
+                            $('#' + id[1]).removeClass('selected');
+                        });
+                    }
+                },
+                {
+                    text: '몇개?',
+                    className: 'btn-sm btn-secondary',
+                    action: function (e, dt, node, config) {
+                        var ids = '';
+                        var cnt = 0;
+                        //체크박스 사용인 경우
+                        $.each($('input:checkbox:checked'), function (idx, val) {
+                            var id = $(this).attr('id').split('_');
+                            cnt++;
+                            if ($('input:checkbox:checked').length == cnt)
+                                ids += id[1];
+                            else
+                                ids += id[1] + ', ';
+                        });
+                        Swal.fire($('input:checkbox:checked').length + '개 선택\n' + ids);
+                    }
+                }
+            ]
+        });
+
+
+        //체크박스 사용인 경우
+        // select: 'multi'
+        $('#grid_product tbody').on('click', 'tr', function() {
+            if ($(this).hasClass('selected')) {
+                $('#chkbx_' + $(this).attr('id')).prop('checked', false);
+                $(this).removeClass('selected');
+            }
+            else
+            {
+                $('#chkbx_' + $(this).attr('id')).prop('checked', true);
+                $(this).addClass('selected');
+            }
+        });
+
+        // select: 'single'
+        /*
+        $('#grid_product tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $('#chkbx_' + $(this).attr('id')).prop('checked', false);
+                $(this).removeClass('selected');
+            }
+            else {
+                $.each($('tr.selected'), function (idx, val) {
+                    $('#chkbx_' + $(this).attr('id')).prop('checked', false);
+                    $(this).removeClass('selected');
+                });
+                $('#chkbx_' + $(this).attr('id')).prop('checked', true);
+                $(this).addClass('selected');
+            }
+        });
+        */
+    });
+    </script>
+}
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel1-1" class="panel">
+            <div class="panel-hdr">
+                <h2>
+                    <span>상품관리</span>
+                </h2>
+            </div>
+            <div class="col-xl-12 ml-auto mr-auto mt-3 mb-3">
+                <div class="card p-4 rounded-plus bg-faded">
+                    <table id="grid_product" class="display table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>선택</th>
+                                <th>상품코드</th>
+                                <th>상품명</th>
+                                <th>상태</th>
+                                <th>판매가</th>
+                                <th>등록일</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

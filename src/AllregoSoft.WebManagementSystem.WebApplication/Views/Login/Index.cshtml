@@ -1,0 +1,107 @@
+﻿@{
+    ViewData["Title"] = "로그인";
+    Layout = "~/Views/Shared/_NoLayout.cshtml";
+}
+
+@section css {
+<style>
+    .btn-login {
+        color: #fff;
+        background-color: #1C1C1C;
+        border-color: #1C1C1C;
+    }
+</style>
+}
+
+@section scripts{
+    <script>
+    $(document).ready(function () {
+        $('#inputId').focus();
+
+        $('#js-login-btn').click(function () {
+            login();
+        });
+
+        $("#inputId").on("keydown", function (event) {
+            if (event.which == 13)
+                $("#inputPassword").focus();
+        });
+
+        $("#inputPassword").on("keydown", function (event) {
+            if (event.which == 13)
+                login();
+        });
+    });
+
+    function login() {
+        var UsrId = $("#inputId").val();
+        var UsrPw = $("#inputPassword").val();
+
+        if (UsrId == "") {
+            alert("아이디를 입력하세요");
+            $("#inputId").focus();
+            return false;
+        }
+        if (UsrPw == "") {
+            alert("패스워드를 입력하세요");
+            $("#inputPassword").focus();
+            return false;
+        }
+
+        var data = JSON.stringify({ 'Id': UsrId, 'Pwd': UsrPw });
+        //console.log(data);
+
+        fetch('/Login/LoginProc',
+        {
+            method: 'POST',
+            body: data,
+            headers: {
+                'Content-Type': 'application/json;'
+            }
+        })
+        .then(response => response.json())
+        .then(function (data) {
+            data = JSON.parse(data);
+            //console.log(data);
+            if (data.result == 'true') {
+                //Swal.fire('로그인 성공!');
+                location.href = '@ViewBag.ReturnUrl';
+            } else {
+                Swal.fire(data.msg);
+                console.log(data.msg);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    </script>
+}
+
+<div class="flex-1" style="background-size: cover;">
+    <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+        <div class="row">
+            <div class="col col-xs-2 col-sm-2 col-md-3 col-lg-4 col-xl-4"></div>
+            <div class="col-xs-6 col-sm-8 col-md-6 col-lg-4 col-xl-4 mt-3 mb-3">
+                <div class="card p-4 rounded-plus bg-faded">
+                    <div class="form-group">
+                        <div class="frame-wrap">
+                            <input type="text" id="inputId" class="form-control form-control-lg" required placeholder="아이디">
+                            <div class="invalid-feedback">아이디를 입력해주세요.</div>
+                        </div>
+                    </div>
+                    <div class="frame-wrap">
+                        <div class="frame-wrap">
+                            <input type="password" id="inputPassword" class="form-control form-control-lg" required placeholder="패스워드">
+                            <div class="invalid-feedback">패스워드를 입력해주세요.</div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="col-lg-12 pr-lg-1 my-2">
+                            <button id="js-login-btn" type="submit" class="btn btn-login btn-block btn-lg">로그인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col col-xs-2 col-sm-2 col-md-3 col-lg-4 col-xl-4"></div>
+        </div>
+    </div>
+</div>

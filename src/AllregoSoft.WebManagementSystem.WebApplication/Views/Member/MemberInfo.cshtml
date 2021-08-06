@@ -1,0 +1,326 @@
+﻿@{
+    if (string.IsNullOrEmpty(Convert.ToString(ViewBag.Id)))
+    {
+        ViewBag.Id = "0";
+        ViewData["Title"] = "회원가입";
+    }
+    else
+    {
+        ViewData["Title"] = "회원정보";
+    }
+}
+
+@section scripts{
+    @*<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>*@
+<script>
+    // 우편번호 찾기 화면을 넣을 element
+    //var element_wrap = null;
+
+    $(document).ready(function () {
+        //element_wrap = document.getElementById('wrap');
+
+        if ($('#Id').attr('data-Id') != 0) {
+            fetch('@Startup.appSettings["ApiDomain"]/Member/MemberInfo',
+            {
+                method: 'POST',
+                body: JSON.stringify({ Id: $('#Id').attr('data-Id') }),
+                headers: {
+                    'Content-Type': 'application/json;'
+                }
+            })
+            .then(response => response.json())
+            .then(function (data) {
+                //console.log(data);
+                $('#Account').val(data.Account);
+                $('#Account').attr('readonly', 'readonly');
+                //$('#password').val(data.Password);
+                $('#Name').val(data.Name);
+                $('#Email').val(data.Email);
+                $('#HP').val(data.HP);
+                $('#smsFl').attr('checked', data.smsFl == 'Y' ? true : false);
+                $('#maillingFl').attr('checked', data.maillingFl == 'Y' ? true : false);
+                $('#UseYN').attr('checked', data.UseYN == 'Y' ? true : false);
+
+                setTimeout(function () { $('#RoleId').val(data.RoleId).prop('selected', true); }, 100);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        $('#savebtn').click(function (event) {
+            // Fetch form to apply custom Bootstrap validation
+            var valiElement = $('#js-member')
+            //console.dir(valiElement[0]);
+
+            if (valiElement[0].checkValidity() === false) {//validation 실패
+                event.preventDefault();
+                event.stopPropagation();
+            } else {//validation 성공
+                if ($('#Password').val() != $('#Password2').val())
+                    Swal.fire('확인', '비밀번호를 확인해주세요.', 'error');
+
+                MemberSend();
+            }
+
+            valiElement.addClass('was-validated');
+            return false;
+        });
+
+        $('#backbtn').click(function () {
+            location.href = '/Member';
+        });
+        //역할리스트 호출 API
+        fetch('@Startup.appSettings["ApiDomain"]/Member/RoleList',
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json;'
+            }
+        })
+        .then(response => response.json())
+        .then(function (data) {
+            //$('#select-single-default').empty(); //역할리스트 초기화
+            for (var cnt = 0; cnt < data.length; cnt++) {
+                var option = $("<option value='" + data[cnt].Id + "'>" + data[cnt].Name + "</option>");
+                $('#RoleId').append(option);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    function MemberSend() {
+        //fromData To JSON
+        var form = document.getElementById('js-member');
+        var object = {};
+        var formData = new FormData(form);
+        formData.forEach(function (value, key) {
+            object[key] = value;
+        });
+        var data = JSON.stringify(object);
+        //회원정보 저장 API
+        fetch('@Startup.appSettings["ApiDomain"]/Member/Member',
+        {
+            method: 'POST',
+            body: data,
+            headers: {
+                'Content-Type': 'application/json;'
+            }
+        })
+        .then(response => response.json())
+        .then(function (data) {
+            //console.log(data);
+            if (data.result == 'true') {
+                Swal.fire('저장에 성공했습니다.');
+                location.href = '/Member';
+            } else {
+                Swal.fire('저장에 실패했습니다.');
+                console.log(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+
+    }
+
+    //function Postcode() {
+    //    // 현재 scroll 위치를 저장해놓는다.
+    //    var currentScroll = Math.max(document.body.scrollTop, document.documentElement.scrollTop);
+
+    //    new daum.Postcode({
+    //        oncomplete: function (data) {
+    //            // 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+    //            // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+    //            // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+    //            var addr = ''; // 주소 변수
+    //            var extraAddr = ''; // 참고항목 변수
+
+    //            //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+    //            if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+    //                addr = data.roadAddress;
+    //            } else { // 사용자가 지번 주소를 선택했을 경우(J)
+    //                addr = data.jibunAddress;
+    //            }
+
+    //            // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+    //            if (data.userSelectedType === 'R') {
+    //                // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+    //                // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+    //                if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+    //                    extraAddr += data.bname;
+    //                }
+    //                // 건물명이 있고, 공동주택일 경우 추가한다.
+    //                if (data.buildingName !== '' && data.apartment === 'Y') {
+    //                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+    //                }
+    //                // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+    //                if (extraAddr !== '') {
+    //                    extraAddr = ' (' + extraAddr + ')';
+    //                }
+    //                // 조합된 참고항목을 해당 필드에 넣는다.
+    //                addr += extraAddr;
+    //            } else {
+    //                addr += '';
+    //            }
+    //            // 우편번호와 주소 정보를 해당 필드에 넣는다.
+    //            document.getElementById('zonecode').value = data.zonecode;
+    //            document.getElementById('address').value = addr;
+    //            // 커서를 상세주소 필드로 이동한다.
+    //            document.getElementById('AddressSub').focus();
+    //            // iframe을 넣은 element를 안보이게 한다.
+    //            // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+    //            element_wrap.style.display = 'none';
+    //            // 우편번호 찾기 화면이 보이기 이전으로 scroll 위치를 되돌린다.
+    //            //document.body.scrollTop = currentScroll;
+    //            $('html, body').animate({ scrollTop: currentScroll }, 0);
+    //        },
+    //        // 우편번호 찾기 화면 크기가 조정되었을때 실행할 코드를 작성하는 부분. iframe을 넣은 element의 높이값을 조정한다.
+    //        onresize: function (size) {
+    //            element_wrap.style.height = size.height + 'px';
+    //        },
+    //        width: '100%',
+    //        height: '100%'
+    //    }).embed(element_wrap);
+    //    // iframe을 넣은 element를 보이게 한다.
+    //    element_wrap.style.display = 'block';
+    //}
+
+    //function foldDaumPostcode() {
+    //    // iframe을 넣은 element를 안보이게 한다.
+    //    element_wrap.style.display = 'none';
+    //}
+</script>
+}
+
+<form id="js-member" novalidate="">
+    <div class="row">
+        <div class="col-xl-12">
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr">
+                    <h2>
+                        <span>기본 정보</span>
+                    </h2>
+                </div>
+                <div class="col-xl-12 ml-auto mr-auto mt-3">
+                    <div class="card p-4 rounded-plus bg-faded">
+                        <input type="hidden" id="Id" name="Id" data-Id="@ViewBag.Id" value="@ViewBag.Id" />
+                        <div class="form-group row">
+                            <div class="col-6 pr-1">
+                                <label class="form-label" for="Account">아이디</label>
+                                <input type="text" id="Account" name="Account" class="form-control" placeholder="아이디" required>
+                                <div class="invalid-feedback">아이디를 입력해주세요.</div>
+                            </div>
+                            <div class="col-6 pr-1">
+                                <label class="form-label" for="Name">이름</label>
+                                <input type="text" id="Name" name="Name" class="form-control" placeholder="이름" required>
+                                <div class="invalid-feedback">이름을 입력해주세요.</div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6 pr-1">
+                                <label class="form-label" for="Password">패스워드</label>
+                                <input type="password" id="Password" name="Password" class="form-control" placeholder="패스워드">
+                                <div class="invalid-feedback">패스워드를 입력해주세요.</div>
+                            </div>
+                            <div class="col-6 pr-1">
+                                <label class="form-label" for="Password2">패스워드 확인</label>
+                                <input type="password" id="Password2" name="Password2" class="form-control" placeholder="패스워드 확인">
+                                <div class="invalid-feedback">패스워드를 입력해주세요.</div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12 pr-1">
+                                <div class="form-group">
+                                    <label class="form-label" for="Email">이메일</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input" id="maillingFl" name="maillingFl" value="true">
+                                                    <label class="custom-control-label" for="maillingFl">수신여부</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="email" id="Email" name="Email" class="form-control" placeholder="allrego@allregosoft.com">
+                                        <div class="invalid-feedback">이메일을 입력해주세요.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-6 pr-1">
+                                <div class="form-group">
+                                    <label class="form-label" for="HP">핸드폰 번호</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input" id="smsFl" name="smsFl" value="true">
+                                                    <label class="custom-control-label" for="smsFl">수신여부</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="tel" id="HP" name="HP" class="form-control" placeholder="핸드폰번호">
+                                        <div class="invalid-feedback">핸드폰 번호를 입력해주세요.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="col-6 pr-1">
+                                <label class="form-label" for="tel">전화번호</label>
+                                <input type="email" id="tel" name="tel" class="form-control" readonly placeholder="전화번호">
+                                <div class="invalid-feedback">전화번호를 입력해주세요.</div>
+                            </div>*@
+                        </div>
+                        @*<div class="form-group row">
+                            <label class="col-xl-12 form-label" for="fname">주소</label>
+                            <div class="col-4 pr-1">
+                                <input type="text" id="zonecode" name="zonecode" class="form-control" style="width:65%; float:left; margin-right:5%;" placeholder="" readonly>
+                                <button type="button" onclick="Postcode()" class="btn btn-info post-search waves-effect waves-themed">주소검색</button>
+                                <div class="invalid-feedback">우편번호 검색해주세요.</div>
+                            </div>
+                        </div>
+                        <div id="wrap" style="display:none;border:1px solid;width:auto;height:auto;margin:5px 0;position:relative">
+                            <img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnFoldWrap" style="cursor:pointer;position:absolute;right:0px;top:-1px;z-index:1" onclick="foldDaumPostcode()" alt="접기 버튼">
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-8 pr-1">
+                                <input type="text" id="address" name="address" class="form-control" placeholder="" readonly>
+                                <div class="invalid-feedback">주소를 검색해주세요.</div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-8 pr-1">
+                                <input type="text" id="AddressSub" name="AddressSub" class="form-control" placeholder="상세주소">
+                                <div class="invalid-feedback">상세주소를 입력해주세요.</div>
+                            </div>
+                        </div>*@
+                        <div class="form-group">
+                            <label class="form-label" for="select-single-default">
+                                사용여부
+                            </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="UseYN" name="UseYN" value="true">
+                                            <label class="custom-control-label" for="UseYN">사용</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <select class="select2 form-control w-100 col-4" id="RoleId" name="RoleId" required>
+                                    <option>선택</option>
+                                </select>
+                                <div class="invalid-feedback">역할을 선택해주세요.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-12 mb-3">
+                    <div class="row no-gutters">
+                        <div class="col-md-3 text-left">
+                            <button id="savebtn" type="submit" class="btn btn-info btn-sm mt-3">저장</button>
+                            <button id="backbtn" type="button" class="btn btn-info btn-sm mt-3">뒤로</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

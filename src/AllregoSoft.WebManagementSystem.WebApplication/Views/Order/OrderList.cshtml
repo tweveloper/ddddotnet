@@ -1,0 +1,125 @@
+﻿@{
+    ViewData["Title"] = "OrderList";
+}
+
+@section css{
+    <link rel="stylesheet" media="screen, print" href="~/bootstrap/css/datagrid/datatables/datatables.bundle.css">
+    <style>
+        .dataTables_filter label {
+            display: flex;
+            float: left;
+        }
+
+        div.dataTables_info {
+            text-align: center;
+        }
+    </style>
+}
+
+@section scripts{
+    <script type="text/javascript" src="~/bootstrap/js/datagrid/datatables/datatables.bundle.js"></script>
+    <script>
+    $(document).ready(function () {
+        $('#grid_order').DataTable({
+            destroy: true,
+            fixedHeader: true,
+            responsive: true,
+            rowId: 'id',
+            order: [[0, 'desc']],
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            select: 'multi',
+            ajax: {
+                url: '@Startup.appSettings["ApiDomain"]/Order/OrderList?id=' + @ViewBag.mall_Id,
+                dataSrc: ''
+            },
+            columns: [
+                { data: "Id", visible: false, searchable: false },
+                { data: "UsrId", className: 'dt-center' },
+                { data: "Site", className: 'dt-center' },
+                { data: "PrdNm", className: 'dt-center' },
+                { data: "OptNM", className: 'dt-head-center dt-body-left' },
+                { data: "Qty", className: 'dt-center' },
+                { data: "BuyerName", className: 'dt-center' },
+                { data: "OrderDateT", className: 'dt-center' },
+                { data: "PayDateT", className: 'dt-center' },
+                { data: "GodoOrderNo", className: 'dt-center' },
+                { data: "ExtendOrderID", className: 'dt-center' },
+                { data: "DeliveryNo", className: 'dt-center' },
+                { data: "soldOut", className: 'dt-center' },
+                { data: "optSoldOut", className: 'dt-center' },
+                { data: "OrderStatus", className: 'dt-center' }
+            ],
+            columnDefs: [
+                {
+                    targets: [3],
+                    render: function (data, type, row) {
+                        return '<a href="http://' + row['UsrId'] + '.cafe24.com/product/detail.html?product_no=' + row['PrdNo'] + '" target="_blank">' + data + '</a>';
+                    }
+                }
+            ],
+            dom: "<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+                "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-4'i><'col-sm-12 col-md-4'p>>",
+            buttons: [
+                {
+                    text: '전체선택',
+                    className: 'btn-sm btn-success',
+                    action: function (e, dt, node, config) {
+                        $('#grid_order').DataTable().rows({ page: 'current' }).select();
+                    }
+                },
+                {
+                    text: '선택해제',
+                    className: 'btn-sm btn-info ',
+                    action: function (e, dt, node, config) {
+                        $('#grid_order').DataTable().rows({ page: 'current' }).deselect();
+                    }
+                },
+                {
+                    text: '몇개?',
+                    className: 'btn-sm btn-secondary',
+                    action: function (e, dt, node, config) {
+                        Swal.fire(dt.rows({ selected: true }).count() + '개 선택\n' + dt.rows({ selected: true }).data().pluck('id').toArray());
+                    }
+                }
+            ]
+        });
+    });
+    </script>
+}
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel1-1" class="panel">
+            <div class="panel-hdr">
+                <h2>
+                    <span>주문관리</span>
+                </h2>
+            </div>
+            <div class="col-xl-12 ml-auto mr-auto mt-3 mb-3">
+                <div class="card p-4 rounded-plus bg-faded">
+                    <table id="grid_order" class="display table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>몰ID</th>
+                                <th>사이트</th>
+                                <th>상품명</th>
+                                <th>옵션명</th>
+                                <th>수량</th>
+                                <th>주문자</th>
+                                <th>주문일</th>
+                                <th>결제일</th>
+                                <th>R2O주문번호</th>
+                                <th>Cafe24주문번호</th>
+                                <th>송장번호</th>
+                                <th>판매여부</th>
+                                <th>품절여부</th>
+                                <th>주문상태</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
