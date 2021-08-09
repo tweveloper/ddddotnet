@@ -1,6 +1,6 @@
 ﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
 
-namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
+namespace AllregoSoft.WebManagementSystem.ApplicationCore.ValueObjects
 {
     public class IisApplicationPool : IValueObject
     {

@@ -1,4 +1,4 @@
-﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Entities;
+﻿using AllregoSoft.WebManagementSystem.ApplicationCore.ValueObjects;
 using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.Administration;

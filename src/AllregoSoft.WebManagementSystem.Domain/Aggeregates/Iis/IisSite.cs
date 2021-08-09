@@ -1,6 +1,6 @@
-﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
+﻿using AllregoSoft.WebManagementSystem.Domain.Interfaces;
 
-namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
+namespace AllregoSoft.WebManagementSystem.Domain.Aggeregates
 {
     public class IisSite : IValueObject
     {

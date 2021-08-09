@@ -13,6 +13,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
     {
         tbl_Member Create(tbl_Member data);
         tbl_Member Create(string account, string password);
+        tbl_Member Get(long id);
     }
     public class MemberService : IMemberService
     {
@@ -26,8 +27,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         }
         public tbl_Member Create(tbl_Member data)
         {
-            _memberRepository.Add(data);
-            _memberRepository.SaveChanges();
+            _memberRepository.Entity.Add(data);
 
             return data;
         }
@@ -41,10 +41,15 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                 Name = account,
                 UseYN = "Y"
             };
-            _memberRepository.Add(member);
-            _memberRepository.SaveChanges();
+            _memberRepository.Entity.Add(member);
+            _memberRepository.UnitOfWork.SaveChanges();
 
             return member;
+        }
+
+        public tbl_Member Get(long id)
+        {
+            return _memberRepository.Entity.Find(id);
         }
     }
 }

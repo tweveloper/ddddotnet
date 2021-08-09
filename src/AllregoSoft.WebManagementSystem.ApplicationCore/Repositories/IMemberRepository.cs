@@ -7,7 +7,11 @@ using System.Threading.Tasks;
 
 namespace AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces
 {
-    public interface IMemberRepository : IRepository<tbl_Member>
+    public interface IMemberRepository : IGenericRepository<tbl_Member>
+    {
+    }
+
+    public interface IMemberTokenRepository : IGenericRepository<tbl_MemberToken>
     {
     }
 }

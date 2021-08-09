@@ -4,6 +4,12 @@
     <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>AllregoSoft.WebManagementSystem.WebApplication</AssemblyName>
     <RootNamespace>AllregoSoft.WebManagementSystem.WebApplication</RootNamespace>
+    <!-- 빌드시 Razor를 dll로 만듭니다. -->
+    <RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <!-- 배포시 Razor를 dll로 만들지 않고 Views 폴더로 배포합니다.. -->
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
+    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+    <!-- 추가 : 끝 -->
   </PropertyGroup>
 
   <ItemGroup>

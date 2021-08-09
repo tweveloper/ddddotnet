@@ -14,7 +14,6 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
     public interface ILoginService
     {
         public tbl_Member Login(string account, string password);
-        public tbl_Member Create(string account, string password);
     }
     #endregion
 
@@ -27,22 +26,13 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
             _memberRepository = memberRepository;
         }
 
-        public tbl_Member Create(string account, string password)
-        {
-            var newMember = new tbl_Member() { Account = account, Password = password, Name = account, UseYN = "Y", RegDate = DateTime.Now, RegMemId = 1 };
-            _memberRepository.Add(newMember);
-            _memberRepository.SaveChanges();
-
-            return newMember;
-        }
-
         /// <summary>
         /// 회원 목록
         /// </summary>
         /// <returns></returns>
         public tbl_Member Login(string account, string password)
         {
-            var user = _memberRepository.GetAll().Where(x => x.Account.Equals(account) && x.UseYN.Equals("Y")).FirstOrDefault();
+            var user = _memberRepository.Entity.ToList().Where(x => x.Account.Equals(account) && x.UseYN.Equals("Y")).FirstOrDefault();
 
             if (user == null)
             {

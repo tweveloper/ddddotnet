@@ -1,11 +1,10 @@
-﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
-using AllregoSoft.WebManagementSystem.ApplicationCore.Module;
+﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Common;
+using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -102,5 +101,25 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Repositories
         {
             _context.Database.BeginTransaction();
         }
+
+        public async Task<TEntity> GetByIdAsync(object id)
+        {
+            return await _context.Set<TEntity>().FindAsync(id);
+        }
+
+        public async Task<IEnumerable<TEntity>> GetAllAsync()
+        {
+            return await _context.Set<TEntity>().ToListAsync();
+        }
+
+        public async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
+        {
+            await _context.Set<TEntity>().AddAsync(entity);
+        }
+
+        public async Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        {
+            await _context.Set<TEntity>().AddRangeAsync(entities);
+        }        
     }
 }

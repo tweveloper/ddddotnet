@@ -27,6 +27,19 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// 회원 조회
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        public ActionResult Get(long id)
+        {
+            var result = _memberService.Get(id);
+            return Ok(result);
+        }
+
+
+
         /////// <summary>
         /////// 회원 목록
         /////// </summary>
