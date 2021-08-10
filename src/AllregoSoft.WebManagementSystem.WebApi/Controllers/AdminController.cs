@@ -1,4 +1,5 @@
-﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Services;
+﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Entities.DataTransferObject;
+using AllregoSoft.WebManagementSystem.ApplicationCore.Services;
 using AllregoSoft.WebManagementSystem.Infrastructure.Module;
 using AllregoSoft.WebManagementSystem.WebApi.Helper;
 using Microsoft.AspNetCore.Authorization;
@@ -46,7 +47,8 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
         [HttpGet("[action]")]
         public IActionResult Login(string account, string password)
         {
-            var result = _loginService.Login(account, password);
+            var loginDTO = new LoginDTO(account, password);
+            var result = _loginService.Login(loginDTO);
 
             return Ok(result);
         }

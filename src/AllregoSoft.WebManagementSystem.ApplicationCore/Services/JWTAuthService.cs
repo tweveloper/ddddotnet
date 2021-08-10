@@ -1,8 +1,11 @@
 ﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Entities;
+using AllregoSoft.WebManagementSystem.ApplicationCore.Entities.ValueObjects;
+using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -29,6 +32,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         /// <param name="token"></param>
         /// <returns></returns>
         public ClaimsPrincipal GetPrincipalFromToken(string token);
+        public TokenResult GetToken(tbl_Member member);
     }
     #endregion
 
@@ -37,11 +41,31 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
     {
         private readonly JwtTokenConfig _jwtTokenConfig;
         private readonly ILogger<JWTAuthService> _logger;
+        private readonly IMemberTokenRepository _memberTokenRepository;
 
-        public JWTAuthService(JwtTokenConfig jwtTokenConfig, ILogger<JWTAuthService> logger)
+        public JWTAuthService(JwtTokenConfig jwtTokenConfig, ILogger<JWTAuthService> logger, IMemberTokenRepository memberTokenRepository)
         {
             _jwtTokenConfig = jwtTokenConfig;
             _logger = logger;
+            _memberTokenRepository = memberTokenRepository;
+        }
+
+        public TokenResult GetToken(tbl_Member member)
+        {
+            bool isSuccess = false;
+            string accessToken = string.Empty;
+            string refreshToken = string.Empty;
+
+            var memberToken = _memberTokenRepository.Entity.Where(x => x.MemberId == member.Id && x.ExpiresAt >= DateTime.Now).FirstOrDefault();
+
+            accessToken = memberToken == null ? BuildToken(BuildClaims(member)) : memberToken.Token;
+            refreshToken = BuildRefreshToken();
+            if (member.UseYN.Equals("Y"))
+            {
+                isSuccess = true;
+            }
+
+            return new TokenResult(isSuccess, member, accessToken, refreshToken);
         }
 
         public string BuildToken(Claim[] claims)
@@ -103,6 +127,20 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                 _logger.LogError($"Token validation failed: {e.Message}");
                 return null;
             }
+        }
+
+        private Claim[] BuildClaims(tbl_Member user)
+        {
+            //User is Valid
+            var claims = new[]
+            {
+                new Claim("id",user.Id.ToString()),
+                new Claim(ClaimTypes.Name,user.Account)
+ 
+                //Add Custom Claims here
+            };
+
+            return claims;
         }
     }
     #endregion
