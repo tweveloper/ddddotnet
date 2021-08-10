@@ -59,7 +59,7 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Module
             return result;
         }
 
-        public async Task<SignInResult> tbl_MemberToken(string AccessToken, string tbl_MemberToken)
+        public async Task<SignInResult> RefreshToken(string AccessToken, string RefreshToken)
         {
 
             ClaimsPrincipal claimsPrincipal = _JwtAuthService.GetPrincipalFromToken(AccessToken);
@@ -74,7 +74,7 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Module
 
             var token = await _memberTokenRepository.Entity
                     .Where(f => f.MemberId == user.Id
-                            && f.Token == tbl_MemberToken
+                            && f.Token == RefreshToken
                             && f.ExpiresAt >= DateTime.Now)
                     .FirstOrDefaultAsync();
 
