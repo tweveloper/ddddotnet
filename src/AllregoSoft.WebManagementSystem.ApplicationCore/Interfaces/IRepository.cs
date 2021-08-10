@@ -12,6 +12,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces
     {
         T GetById(object id);
         IEnumerable<T> GetAll();
+        IQueryable<T> AsQueryable();
         IEnumerable<T> Find(Expression<Func<T, bool>> expression);
         void Add(T entity);
         void AddRange(IEnumerable<T> entities);

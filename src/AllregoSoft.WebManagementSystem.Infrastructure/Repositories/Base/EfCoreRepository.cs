@@ -102,5 +102,10 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Repositories
         {
             _context.Database.BeginTransaction();
         }
+
+        public IQueryable<TEntity> AsQueryable()
+        {
+            return _context.Set<TEntity>().AsQueryable();
+        }
     }
 }

@@ -29,36 +29,6 @@
     @RenderSection("css", false)
     @*<link rel="stylesheet" href="~/css/site.css" />*@
     <script type="text/javascript" src="~/js/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            //클릭한 메뉴 active 저장
-            $('#js-nav-menu li ul li a').click(function () {
-                if ($(this).attr('id') != undefined) {
-                    SetActive($(this).attr('id'));
-                }
-            });
-            $('#js-nav-menu li ul li ul li a').click(function () {
-                //console.log($(this).attr('id'));
-                SetActive($(this).attr('id'));
-            });
-        });
-
-        function SetActive(Id) {
-            fetch('/Role_SiteMap/SetActive',
-            {
-                method: 'POST',
-                body: JSON.stringify({ Id: Id }),
-                headers: {
-                    'Content-Type': 'application/json;'
-                }
-            })
-            .then(response => response.json())
-            .then(function (data) {
-                    console.log(data);
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    </script>
 </head>
 <!-- BEGIN Body -->
 <!-- Possible Classes
@@ -154,7 +124,7 @@
                 <header class="page-header" role="banner">
                     <!-- we need this logo when user switches to nav-function-top -->
                     <div class="page-logo">
-                        <a href="/Home" class="page-logo-link press-scale-down d-flex align-items-center position-relative" data-toggle="modal" data-target="#modal-shortcut">
+                        <a href="/" class="page-logo-link press-scale-down d-flex align-items-center position-relative" data-toggle="modal" data-target="#modal-shortcut">
                             @*<img src="~/bootstrap/img/logo.png" alt="통합 Admin" aria-roledescription="logo">*@
                             <span class="page-logo-text mr-1">SmartAdmin WebApp</span>
                             <span class="position-absolute text-white opacity-50 small pos-top pos-right mr-2 mt-n2"></span>

@@ -37,19 +37,16 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Helpers
             return bRet;
         }
 
-        //public bool GetCRUD(string MemRoleId, string SiteMapId, ref string strRecv)
         public bool GetCRUD(string MemRoleId, ref string strRecv)
         {
             bool bRet = false;
-            strRecv = string.Empty;
-
             string strUri = Startup.appSettings["ApiDomain"] + "/Role/GetCRUD";
+            strRecv = string.Empty;
 
             StringBuilder strbSend = new StringBuilder();
 
             strbSend = new StringBuilder();
             strbSend.Append($"?MemRoleId={MemRoleId}");
-            //strbSend.Append($"&SiteMapId={SiteMapId}");
 
             if (_networkHelper.RestSend("JArrayGet", $"{ strUri }{ strbSend.ToString() }", Method.GET, "", ref strRecv))
             {
@@ -65,11 +62,9 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Helpers
         public bool Login(string usrId, string usrPw, ref string strRecv)
         {
             bool bRet = false;
-
-            var rst = new JObject();
             var jBody = new JObject();
 
-            string strUri = Startup.appSettings["ApiDomain"] + "/Login/LogIn";
+            string strUri = Startup.appSettings["ApiDomain"] + "/Login/Login";
 
             try
             {
@@ -79,7 +74,18 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Helpers
                 jBody.Add("Password", usrPw);
 
                 if (_networkHelper.RestSend("JObjectPost", strUri, Method.POST, jBody, ref strRecv))
-                    bRet = true;
+                {
+                    JObject job = JObject.Parse(strRecv);
+
+                    if (job["error"] == null)
+                    {
+                        bRet = true;
+                    }
+                    else
+                    {
+                        throw new Exception(job["error"].ToString());
+                    }
+                }
             }
             catch (Exception ex)
             {

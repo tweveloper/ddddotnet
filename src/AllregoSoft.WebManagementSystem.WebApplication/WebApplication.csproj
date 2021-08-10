@@ -4,6 +4,13 @@
     <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>AllregoSoft.WebManagementSystem.WebApplication</AssemblyName>
     <RootNamespace>AllregoSoft.WebManagementSystem.WebApplication</RootNamespace>
+
+	<!-- 빌드시 Razor를 dll로 만듭니다. -->
+	<RazorCompileOnBuild>true</RazorCompileOnBuild>
+	<!-- 배포시 Razor를 dll로 만들지 않고 Views 폴더로 배포합니다.. -->
+	<RazorCompileOnPublish>true</RazorCompileOnPublish>
+	<TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+	<!-- 추가 : 끝 -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,12 +19,16 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.3.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="RestSharp" Version="106.12.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AllregoSoft.WebManagementSystem.ApplicationCore\ApplicationCore.csproj" />
+    <ProjectReference Include="..\AllregoSoft.WebManagementSystem.Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

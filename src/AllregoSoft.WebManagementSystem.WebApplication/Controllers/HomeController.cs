@@ -11,25 +11,24 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Controllers
     public class HomeController : Controller
     {
         private readonly webApiHelper _webApiHelper;
-        private readonly Role_SiteMap _roleSite;
+        //private readonly Role_SiteMap _roleSite;
 
-        public HomeController(webApiHelper webApiHelper, Role_SiteMap RoleSite)
+        public HomeController(webApiHelper webApiHelper) //, Role_SiteMap RoleSite)
         {
             _webApiHelper = webApiHelper;
-            _roleSite = RoleSite;
+            //_roleSite = RoleSite;
         }
 
-        //[UserAuthorizationFilter]
+        [UserAuthorizationFilter]
         public IActionResult Index()
         {
             //TempData["UsrRoleId"] 강제 설정, 로그인할 때 받아오면 됨
-            if (TempData["UsrRoleId"] == null)
-                TempData["UsrRoleId"] = "1";
+            //if (TempData["UsrRoleId"] == null)
+            //    TempData["UsrRoleId"] = "1";
             //GetSiteMap 호출하여 TempData["SiteMap"]에 메뉴(SiteMap) 데이터 저장
 
             string strRecv = "";
 
-            //if (_webApiHelper.GetSiteMap(HttpContext.Session.GetInt32("UsrRoleId").ToString(), ref strRecv))
             if (_webApiHelper.GetSiteMap(TempData["UsrRoleId"].ToString(), ref strRecv))
             {
                 TempData["SiteMap"] = JArray.Parse(strRecv);
@@ -39,11 +38,6 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Controllers
                 TempData["SiteMap"] = null;
             }
 
-            _roleSite.GetCRUD(TempData["UsrRoleId"].ToString(), TempData);
-            //TempData["SiteMap"] 데이터 유지
-            //TempData.Keep("SiteMap");
-            //TempData["UsrRoleId"] 데이터 유지
-            //TempData.Keep("UsrRoleId");
             TempData.Keep();
 
             return View();

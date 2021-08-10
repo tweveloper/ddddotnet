@@ -23,7 +23,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
         /// <summary>
         /// 수정자
         /// </summary>
-        public virtual int? ModMemId { get; set; }
+        public virtual long? ModMemId { get; set; }
         /// <summary>
         /// 수정일
         /// </summary>

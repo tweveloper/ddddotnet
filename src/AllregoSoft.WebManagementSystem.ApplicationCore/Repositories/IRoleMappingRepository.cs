@@ -2,7 +2,7 @@
 
 namespace AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces
 {
-    public interface IRoleRepository : IRepository<tbl_Role>
+    public interface IRoleMappingRepository : IRepository<tbl_Role_Mapping>
     {
     }
 }

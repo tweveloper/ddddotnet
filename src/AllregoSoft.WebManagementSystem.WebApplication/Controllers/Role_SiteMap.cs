@@ -1,5 +1,4 @@
 ﻿using AllregoSoft.WebManagementSystem.WebApplication.Helpers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Newtonsoft.Json.Linq;
@@ -17,135 +16,82 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Controllers
 
         [HttpPost]
         //현재 클릭된 메뉴가 열려 있도록 active 저장
-        public void SetActive([FromBody] JObject data)
+        public void SetActive(string Id, ITempDataDictionary TempData)
         {
-            if (data.Count > 0)
-            {
-                string strParent1 = string.Empty;
-                string strParent2 = string.Empty;
+            string strParent1 = string.Empty;
+            string strParent2 = string.Empty;
 
-                foreach (var FirstMap in TempData["SiteMap"] as JArray)
+            foreach (var FirstMap in TempData["SiteMap"] as JArray)
+            {
+                foreach (var SecondMap in FirstMap["SecondMaps"])
                 {
-                    foreach (var SecondMap in FirstMap["SecondMaps"])
+                    if (!SecondMap["ThirdMaps"].HasValues)
                     {
-                        if(!SecondMap["ThirdMaps"].HasValues)
+                        if (SecondMap["Id"].ToString() == Id)
                         {
-                            if (SecondMap["Id"].ToString() == data["Id"].ToString())
+                            strParent2 = SecondMap["Parent"].ToString();
+                            SecondMap["Active"] = "true";
+                            FirstMap["ParentMap"]["Active"] = "true";
+                        }
+                        else
+                        {
+                            SecondMap["Active"] = "";
+
+                            if (SecondMap["Parent"].ToString() != strParent2 && string.IsNullOrEmpty(strParent1))
+                                FirstMap["ParentMap"]["Active"] = "";
+                        }
+                    }
+                    else
+                    {
+                        foreach (var ThirdMap in SecondMap["ThirdMaps"])
+                        {
+                            if (ThirdMap["Id"].ToString() == Id)
                             {
-                                strParent2 = SecondMap["Parent"].ToString();
+                                strParent2 = ThirdMap["Parent"].ToString();
+                                strParent1 = SecondMap["Parent"].ToString();
+                                ThirdMap["Active"] = "true";
                                 SecondMap["Active"] = "true";
                                 FirstMap["ParentMap"]["Active"] = "true";
                             }
                             else
                             {
-                                SecondMap["Active"] = "";
+                                ThirdMap["Active"] = "";
 
-                                if (SecondMap["Parent"].ToString() != strParent2 && string.IsNullOrEmpty(strParent1))
-                                    FirstMap["ParentMap"]["Active"] = "";
-                            }
-                        }
-                        else
-                        {
-                            foreach (var ThirdMap in SecondMap["ThirdMaps"])
-                            {
-                                if (ThirdMap["Id"].ToString() == data["Id"].ToString())
+                                if (SecondMap["Id"].ToString() != strParent2)
                                 {
-                                    strParent2 = ThirdMap["Parent"].ToString();
-                                    strParent1 = SecondMap["Parent"].ToString();
-                                    ThirdMap["Active"] = "true";
-                                    SecondMap["Active"] = "true";
-                                    FirstMap["ParentMap"]["Active"] = "true";
-                                }
-                                else
-                                {
-                                    ThirdMap["Active"] = "";
+                                    SecondMap["Active"] = "";
 
-                                    if (SecondMap["Id"].ToString() != strParent2) {
-                                        SecondMap["Active"] = "";
-
-                                        if (FirstMap["Key"].ToString() != strParent1)
-                                        {
-                                            FirstMap["ParentMap"]["Active"] = "";
-                                        }
+                                    if (FirstMap["Key"].ToString() != strParent1)
+                                    {
+                                        FirstMap["ParentMap"]["Active"] = "";
                                     }
                                 }
                             }
                         }
                     }
                 }
-                //TempData["SiteMap"] 데이터 유지
-                //TempData.Keep("SiteMap");
-                //클릭한 메뉴의 SiteMapId 저장
-                TempData["SiteMapId"] = data["Id"].ToString();
-                //HttpContext.Session.SetString("SiteMapId", data["Id"].ToString());
-                //TempData["SiteMapId"] 데이터 유지
-                //TempData.Keep("SiteMapId");
-                //GetCRUD(HttpContext.Session.GetInt32("UsrRoleId").ToString(), TempData);
-                //GetCRUD(HttpContext.Session.GetInt32("UsrRoleId").ToString(), data["Id"].ToString(), TempData);
             }
-            TempData["C"] = "";
-            TempData["R"] = "";
-            TempData["U"] = "";
-            TempData["D"] = "";
             TempData.Keep();
         }
 
-        //CRUD 권한을 TempData에 각각 저장
-        //public void GetCRUD(string RoleId, string SiteMapId, ITempDataDictionary TempData)
+        //전체 CRUD 권한을 TempData에 저장
         public void GetCRUD(string RoleId, ITempDataDictionary TempData)
         {
             string strRecv = "";
 
-            //if (_webApiHelper.GetCRUD(RoleId, SiteMapId, ref strRecv)) 
             if (_webApiHelper.GetCRUD(RoleId, ref strRecv))
             {
                 TempData["AllCRUD"] = JArray.Parse(strRecv);
-                //strRecv = strRecv.Replace("[", "").Replace("]", "").Replace("{", "").Replace("}", "").Replace("\"\"", "\"");
-
-                //if (strRecv.Length > 0)
-                //{
-                //    string[] temp = strRecv.Split(",");
-
-                //    foreach (string data in temp)
-                //    {
-                //        string[] tempdata = data.Replace("\"", "").Split(":");
-
-                //        if (tempdata[0] == "C")
-                //            TempData["C"] = tempdata[1].ToString();
-                //        else if (tempdata[0] == "R")
-                //            TempData["R"] = tempdata[1].ToString();
-                //        else if (tempdata[0] == "U")
-                //            TempData["U"] = tempdata[1].ToString();
-                //        else
-                //            TempData["D"] = tempdata[1].ToString();
-                //    }
-                //    //TempData["CRUD"] = JArray.Parse(strRecv);
-                //}
-                //else
-                //{
-                //    TempData["C"] = "";
-                //    TempData["R"] = "";
-                //    TempData["U"] = "";
-                //    TempData["D"] = "";
-                //    //TempData["CRUD"] = null;
-                //}
             }
             else
             {
-                //TempData["C"] = "";
-                //TempData["R"] = "";
-                //TempData["U"] = "";
-                //TempData["D"] = "";
                 TempData["AllCRUD"] = null;
             }
-            //TempData["UsrRoleId"] 데이터 유지
-            //TempData.Keep("UsrRoleId");
-            //TempData["SiteMapId"] 데이터 유지
-            //TempData.Keep("SiteMapId");
             TempData.Keep();
         }
 
-        public void CheckCRUD(string SiteMapId, ITempDataDictionary TempData)
+        //권한 체크
+        public bool CheckAuth(string Path, ITempDataDictionary TempData)
         {
             JArray JArr = JArray.Parse(TempData["AllCRUD"].ToString());
 
@@ -154,18 +100,32 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Controllers
             TempData["U"] = "";
             TempData["D"] = "";
 
+            //CRUD 권한 체크
+            int count = 0;
             foreach (var data in JArr)
             {
-                if(data["Key"].ToString() == SiteMapId)
+                if (data["Path"].ToString() == Path)
                 {
-                    TempData["C"] = data["data"]["C"].ToString();
-                    TempData["R"] = data["data"]["R"].ToString();
-                    TempData["U"] = data["data"]["U"].ToString();
-                    TempData["D"] = data["data"]["D"].ToString();
+                    TempData["C"] = data["C"] == null ? "" : data["C"].ToString();
+                    TempData["R"] = data["R"] == null ? "" : data["R"].ToString();
+                    TempData["U"] = data["U"] == null ? "" : data["U"].ToString();
+                    TempData["D"] = data["D"] == null ? "" : data["D"].ToString();
+
+                    SetActive(data["Id"].ToString(), TempData);
+                    count++;
                     break;
                 }
             }
             TempData.Keep();
+            //페이지 접근 권한 체크
+            if (count == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }

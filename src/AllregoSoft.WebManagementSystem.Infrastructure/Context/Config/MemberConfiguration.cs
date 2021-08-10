@@ -23,7 +23,7 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Context.Config
             builder.Property(p => p.Id).HasComment("고유번호");
             builder.Property(p => p.Name).HasComment("이름");
 
-            DescriptionManager<tbl_Member>.UpdateHasComment(builder);
+            //DescriptionManager<tbl_Member>.UpdateHasComment(builder);
         }
     }
 

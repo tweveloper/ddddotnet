@@ -1,21 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading;
+﻿using AllregoSoft.WebManagementSystem.WebApplication.Filters;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AllregoSoft.WebManagementSystem.WebApplication.Controllers
 {
+    [UserAuthorizationFilter]
+
     public class OrderController : Controller
     {
-        private readonly Role_SiteMap _roleSite;
-
-        public OrderController(Role_SiteMap RoleSite)
-        {
-            _roleSite = RoleSite;
-        }
-
         public IActionResult OrderList()
         {
-            Thread.Sleep(50);
-            _roleSite.CheckCRUD(TempData["SiteMapId"].ToString(), TempData);
             ViewBag.mall_Id = 369;
             return View();
         }

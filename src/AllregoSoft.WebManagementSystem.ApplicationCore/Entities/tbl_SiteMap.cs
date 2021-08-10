@@ -1,9 +1,8 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
 
 namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
 {
-    public class tbl_SiteMap : BaseEntity
+    public class tbl_SiteMap : BaseEntity, IAggregateRoot
     {
 
         /// <summary>
@@ -13,7 +12,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
         /// <summary>
         /// 상위고유번호
         /// </summary>
-        public int Parent { get; set; }
+        public long Parent { get; set; }
         /// <summary>
         /// 차수
         /// </summary>

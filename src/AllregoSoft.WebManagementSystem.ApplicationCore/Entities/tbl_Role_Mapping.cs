@@ -1,10 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
 {
-    public class tbl_Role_Mapping : BaseEntity
+    public class tbl_Role_Mapping : BaseEntity, IAggregateRoot
     {
         /// <summary>
         /// 역할고유번호
@@ -37,7 +36,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
         /// <summary>
         /// 메뉴고유번호
         /// </summary>
-        public int SiteMapId { get; set; }
+        public long SiteMapId { get; set; }
         [InverseProperty("RoleMapping")]
         public virtual tbl_Role Role { get; set; }
         //[Display(Name = "등록자"), Required]

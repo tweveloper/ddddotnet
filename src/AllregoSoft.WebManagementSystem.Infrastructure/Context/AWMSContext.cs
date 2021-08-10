@@ -32,7 +32,7 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Context
 
             //OnModelCreatingPartial(modelBuilder);
             base.OnModelCreating(modelBuilder);
-            //modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
 
         //partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

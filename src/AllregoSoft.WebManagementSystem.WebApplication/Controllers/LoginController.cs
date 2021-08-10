@@ -25,31 +25,28 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Controllers
             return View();
         }
 
-        ///// <summary>
-        ///// 로그인
-        ///// </summary>
-        ///// <returns></returns>
+        /// <summary>
+        /// 로그인
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult LoginProc([FromBody] JObject data)
         {
             string strRecv = "";
             var jRetObj = new JObject();
 
-            if(_webApiHelper.Login(data["Id"].ToString(), data["Pwd"].ToString(), ref strRecv))
+            if (_webApiHelper.Login(data["Id"].ToString(), data["Pwd"].ToString(), ref strRecv))
             {
                 jRetObj = JObject.Parse(strRecv);
-                TempData["UsrId"] = Convert.ToInt32(jRetObj["Id"]);
+                TempData["UsrId"] = Convert.ToInt64(jRetObj["Id"]);
                 //TempData["UsrApiId"] = Convert.ToInt32(jRetObj["ApiId"]);
-                TempData["UsrRoleId"] = Convert.ToInt32(jRetObj["RoleId"]);
+                TempData["UsrRoleId"] = Convert.ToInt64(jRetObj["RoleId"]);
                 //TempData["UsrAccount"] = Account;
-                //TempData["UsrPassword"] = Password;
+                TempData["UsrPassword"] = data["Pwd"].ToString();
                 //TempData["RoleName"] = Util.GetJsonParse(strRecv, "RoleNm");
                 TempData["UsrName"] = jRetObj["Name"].ToString();
+                //ConstantHelper.Password = jRetObj["Password"].ToString();
 
-                //HttpContext.Session.SetInt32("UsrId", Convert.ToInt32(jRetObj["Id"]));
-                HttpContext.Session.SetInt32("UsrRoleId", Convert.ToInt32(jRetObj["RoleId"]));
-                //HttpContext.Session.SetString("UsrName", jRetObj["Name"].ToString());
-                /*
                 if (_webApiHelper.GetSiteMap(TempData["UsrRoleId"].ToString(), ref strRecv))
                 {
                     TempData["SiteMap"] = JArray.Parse(strRecv);
@@ -58,8 +55,9 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Controllers
                 {
                     TempData["SiteMap"] = null;
                 }
-                */
-                //TempData.Keep();
+                TempData.Keep();
+
+                _roleSite.GetCRUD(TempData["UsrRoleId"].ToString(), TempData);
                 jRetObj.Add("result", "true");
             }
             else

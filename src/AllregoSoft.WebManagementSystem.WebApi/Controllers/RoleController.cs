@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Services;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
 {
@@ -7,83 +9,81 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
 
     public class RoleController : Controller
     {
-        //private readonly RoleService _service;
+        private readonly IRoleService _roleservice;
 
-        //public RoleController(RoleService service)
-        //{
-        //    _service = service;
-        //}
+        public RoleController(IRoleService roleservice)
+        {
+            _roleservice = roleservice;
+        }
 
-        /////// <summary>
-        /////// 역할 리스트
-        /////// </summary>
-        /////// <returns></returns>
-        //[HttpGet("[action]")]
-        //public ActionResult RoleList()
-        //{
-        //    var list = _service.RoleList();
-        //    return Ok(list);
-        //}
+        /// <summary>
+        /// 역할 리스트
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        public ActionResult RoleList()
+        {
+            var list = _roleservice.RoleList();
+            return Ok(list);
+        }
 
-        /////// <summary>
-        /////// 역할 등록/수정
-        /////// </summary>
-        /////// <returns></returns>
-        //[HttpPost("[action]")]
-        //public IActionResult Role([FromBody] JObject data)
-        //{
-        //    var List = _service.AddOrUpdate(data);
+        /// <summary>
+        /// 역할 등록/수정
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        public IActionResult Role([FromBody] JObject data)
+        {
+            var List = _roleservice.AddOrUpdate(data);
 
-        //    return Ok(List);
-        //}
+            return Ok(List);
+        }
 
-        /////// <summary>
-        /////// 역할별 메뉴 리스트
-        /////// </summary>
-        /////// <returns></returns>
-        //[HttpGet("[action]")]
-        //public IActionResult Role_SiteMapList(int Id)
-        //{
-        //    var result = _service.Role_SiteMapList(Id);
+        /// <summary>
+        /// 역할별 메뉴 리스트
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        public IActionResult Role_SiteMapList(long Id)
+        {
+            var result = _roleservice.Role_SiteMapList(Id);
 
-        //    return Ok(result);
-        //}
+            return Ok(result);
+        }
 
-        /////// <summary>
-        /////// 역할별 메뉴 리스트 등록/수정
-        /////// </summary>
-        /////// <returns></returns>
-        //[HttpPost("[action]")]
-        //public IActionResult Role_SiteMap([FromBody] JObject data)
-        //{
-        //    var result = _service.RoleMappingSave(data);
+        /// <summary>
+        /// 역할별 메뉴 리스트 등록/수정
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        public IActionResult Role_SiteMap([FromBody] JObject data)
+        {
+            var result = _roleservice.RoleMappingSave(data);
 
-        //    return Ok(result);
-        //}
+            return Ok(result);
+        }
 
-        /////// <summary>
-        /////// 역할 CRUD 등록/수정
-        /////// </summary>
-        /////// <returns></returns>
-        //[HttpPost("[action]")]
-        //public IActionResult Role_SiteMap_CRUD([FromBody] JObject data)
-        //{
-        //    var List = _service.Role_SiteMap_CRUD(data);
+        /// <summary>
+        /// 역할 CRUD 등록/수정
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        public IActionResult Role_SiteMap_CRUD([FromBody] JObject data)
+        {
+            var List = _roleservice.Role_SiteMap_CRUD(data);
 
-        //    return Ok(List);
-        //}
+            return Ok(List);
+        }
 
-        /////// <summary>
-        /////// CRUD 가져오기
-        /////// </summary>
-        /////// <returns></returns>
-        //[HttpGet("[action]")]
-        ////public IActionResult GetCRUD(int MemRoleId, int SiteMapId)
-        //public IActionResult GetCRUD(int MemRoleId)
-        //{
-        //    //var List = _service.GetCRUD(MemRoleId, SiteMapId);
-        //    var List = _service.GetCRUD(MemRoleId);
-        //    return Ok(List);
-        //}
+        /// <summary>
+        /// CRUD 가져오기
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        public IActionResult GetCRUD(long MemRoleId)
+        {
+            var List = _roleservice.GetCRUD(MemRoleId);
+            return Ok(List);
+        }
     }
 }
