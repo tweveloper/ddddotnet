@@ -15,12 +15,12 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
     public interface IMemberService
     {
         tbl_Member Create(tbl_Member data);
-        tbl_Member Create(string account, string password);
-        dynamic MemberList();
-        tbl_Member MemberInfo(long Id);
-        JObject AddOrUpdate(JObject data);
-        dynamic RoleList();
-        JObject Delete(string[] list);
+        //tbl_Member Create(string account, string password);
+        //dynamic MemberList();
+        //tbl_Member MemberInfo(long Id);
+        //JObject AddOrUpdate(JObject data);
+        //dynamic RoleList();
+        //JObject Delete(string[] list);
     }
     public class MemberService : IMemberService
     {

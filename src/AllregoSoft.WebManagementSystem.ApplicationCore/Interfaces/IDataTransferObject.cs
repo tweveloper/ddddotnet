@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 namespace AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces
 {
     /// <summary>
-    /// Marker Interface
-    /// Value Object
+    /// DTO
     /// </summary>
     public interface IDataTransferObject
     {
+        bool IsSuccess { get; protected set; }
+        string Message { get; protected set; }
     }
 }
