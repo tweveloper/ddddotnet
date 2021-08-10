@@ -39,8 +39,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         }
         public tbl_Role Create(tbl_Role data)
         {
-            _roleRepository.Add(data);
-            _roleRepository.SaveChanges();
+            _roleRepository.UnitOfWork.Add(data);
+            _roleRepository.UnitOfWork.SaveChanges();
 
             return data;
         }

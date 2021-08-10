@@ -13,7 +13,6 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
     public interface ILoginService
     {
         public dynamic Login(string account, string password);
-        public tbl_Member Create(string account, string password);
     }
     #endregion
 
@@ -32,7 +31,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         /// <returns></returns>
         public dynamic Login(string account, string password)
         {
-            var user = _memberRepository.GetAll().Where(x => x.Account.Equals(account) && x.UseYN.Equals("Y")).FirstOrDefault();
+            var Job = new JObject();
+            var user = _memberRepository.Entity.Where(x => x.Account.Equals(account) && x.UseYN.Equals("Y")).FirstOrDefault();
 
             try
             {
