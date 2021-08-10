@@ -2,7 +2,7 @@
 
 namespace AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces
 {
-    public interface ISiteMapRepository : IRepository<tbl_SiteMap>
+    public interface ISiteMapRepository : IGenericRepository<tbl_SiteMap>
     {
     }
 }

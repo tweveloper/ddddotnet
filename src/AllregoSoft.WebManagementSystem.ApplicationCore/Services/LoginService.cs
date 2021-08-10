@@ -38,39 +38,32 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         /// 회원 목록
         /// </summary>
         /// <returns></returns>
-        public string Login(LoginDTO data)
+        public LoginResult Login(string account, string password)
         {
-            var user = _memberRepository.Entity.Where(x => x.Account.Equals(data.Account) && x.UseYN.Equals("Y")).FirstOrDefault();
+            //var user = _memberRepository.Entity.Where(x => x.Account.Equals(account) && x.UseYN.Equals("Y")).FirstOrDefault();
 
-            try
-            {
-                if (user == null)
-                {
-                    throw new Exception("회원정보가 없습니다.");
-                }
-                else
-                {
-                    SHA256Managed sha256Managed = new SHA256Managed();
+            //try
+            //{
+            //    if (user == null)
+            //    {
+            //        throw new Exception("회원정보가 없습니다.");
+            //    }
+            //    else
+            //    {
+            //        SHA256Managed sha256Managed = new SHA256Managed();
 
-                    if (!string.Equals(Convert.ToBase64String(sha256Managed.ComputeHash(Encoding.Default.GetBytes(data.Password))), user.Password))
-                    {
-                        throw new Exception("비밀번호가 잘못되었습니다.");
-                    }
+            //        if (!string.Equals(Convert.ToBase64String(sha256Managed.ComputeHash(Encoding.Default.GetBytes(password))), user.Password))
+            //            throw new Exception("비밀번호가 잘못되었습니다.");
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Job.Add("error", ex.Message);
+            //    return JObject.Parse(JsonConvert.SerializeObject(Job));
+            //}
 
-                    var tokenResult = _jWTAuthService.GetToken(user);
-
-                    data.IsSuccess = tokenResult.IsSuccess;
-                    data.Token = tokenResult.AccessToken;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                data.IsSuccess = false;
-                data.Message = ex.Message;
-            }
-
-            return data.Result();
+            //return user;
+            return new LoginResult(true, "");
         }
     }
     #endregion

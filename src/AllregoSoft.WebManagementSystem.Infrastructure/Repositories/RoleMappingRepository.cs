@@ -4,7 +4,7 @@ using AllregoSoft.WebManagementSystem.Infrastructure.Context;
 
 namespace AllregoSoft.WebManagementSystem.Infrastructure.Repositories
 {
-    public class RoleMappingRepository : EfCoreRepository<tbl_Role_Mapping, AWMSContext>, IRoleMappingRepository
+    public class RoleMappingRepository : GenericRepository<tbl_Role_Mapping, AWMSContext>, IRoleMappingRepository
     {
         public RoleMappingRepository(AWMSContext context) : base(context) { }
     }
