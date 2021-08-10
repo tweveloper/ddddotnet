@@ -1,4 +1,5 @@
 ﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Entities;
+using AllregoSoft.WebManagementSystem.ApplicationCore.Entities.DataTransferObject;
 using AllregoSoft.WebManagementSystem.ApplicationCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
@@ -24,7 +25,8 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
         [HttpPost("[action]")]
         public IActionResult Login([FromBody] JObject data)
         {
-            var item = _loginService.Login(data["Id"].ToString(), data["Password"].ToString());
+            var loginDto = new LoginDTO(data["Id"].ToString(), data["Password"].ToString());
+            var item = _loginService.Login(loginDto);
             return Ok(item);
         }
     }
