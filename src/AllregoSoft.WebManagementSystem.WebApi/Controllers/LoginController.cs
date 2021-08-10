@@ -23,9 +23,9 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("[action]")]
-        public IActionResult Login([FromBody] JObject data)
+        public IActionResult Login(string account, string password)
         {
-            var loginDto = new LoginDTO(data["Id"].ToString(), data["Password"].ToString());
+            var loginDto = new LoginDTO(account, password);
             var item = _loginService.Login(loginDto);
             return Ok(item);
         }
