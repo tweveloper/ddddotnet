@@ -13,7 +13,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces
         #region | 동기 |
         T GetById(object id);
         IEnumerable<T> GetAll();
-        IQueryable<T> AsQueryable();
+        //IQueryable<T> AsQueryable();
         IEnumerable<T> Find(Expression<Func<T, bool>> expression);
         void Add(T entity);
         void AddRange(IEnumerable<T> entities);
@@ -24,10 +24,10 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces
         #endregion
 
         #region | 비동기 |
-        Task<T> GetByIdAsync(object id);
-        Task<IEnumerable<T>> GetAllAsync();
-        Task AddAsync(T entity, CancellationToken cancellationToken = default(CancellationToken));
-        Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default(CancellationToken));
+        //Task<T> GetByIdAsync(object id);
+        //Task<IEnumerable<T>> GetAllAsync();
+        //Task AddAsync(T entity, CancellationToken cancellationToken = default(CancellationToken));
+        //Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default(CancellationToken));
 
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
         public Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken));
