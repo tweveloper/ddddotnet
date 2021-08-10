@@ -1,11 +1,10 @@
-﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
-using AllregoSoft.WebManagementSystem.ApplicationCore.Module;
+﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Common;
+using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -101,11 +100,6 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Repositories
         public void BeginTransaction()
         {
             _context.Database.BeginTransaction();
-        }
-
-        public IQueryable<TEntity> AsQueryable()
-        {
-            return _context.Set<TEntity>().AsQueryable();
         }
     }
 }

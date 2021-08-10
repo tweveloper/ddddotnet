@@ -53,15 +53,6 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
 
         [AllowAnonymous]
         [HttpGet("[action]")]
-        public IActionResult MemberCreate(string account, string password)
-        {
-            var result = _loginService.Create(account, password);
-
-            return Ok(result);
-        }
-
-        [AllowAnonymous]
-        [HttpGet("[action]")]
         public IActionResult GetToken(string account, string password)
         {
             var result = _signInManager.SignIn(account, password);

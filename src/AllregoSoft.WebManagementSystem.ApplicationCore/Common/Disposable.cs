@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AllregoSoft.WebManagementSystem.ApplicationCore.Module
+namespace AllregoSoft.WebManagementSystem.ApplicationCore.Common
 {
     public class Disposable : IDisposable
     {

@@ -1,4 +1,5 @@
 ﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Entities;
+using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
 using AllregoSoft.WebManagementSystem.ApplicationCore.Services;
 using AllregoSoft.WebManagementSystem.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -13,19 +14,22 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Module
     public class SignInManager
     {
         private readonly ILogger<SignInManager> _logger;
-        private readonly AWMSContext _context;
         private readonly IJWTAuthService _JwtAuthService;
         private readonly JwtTokenConfig _jwtTokenConfig;
+        private readonly IMemberRepository _memberRepository;
+        private readonly IMemberTokenRepository _memberTokenRepository;
 
         public SignInManager(ILogger<SignInManager> logger,
                              IJWTAuthService JWTAuthService,
                              JwtTokenConfig jwtTokenConfig,
-                             AWMSContext context)
+                             IMemberRepository memberRepository,
+                             IMemberTokenRepository memberTokenRepository)
         {
             _logger = logger;
-            _context = context;
             _JwtAuthService = JWTAuthService;
             _jwtTokenConfig = jwtTokenConfig;
+            _memberRepository = memberRepository;
+            _memberTokenRepository = memberTokenRepository;
         }
 
         public async Task<SignInResult> SignIn(string account, string password)
@@ -37,7 +41,7 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Module
             if (string.IsNullOrWhiteSpace(account)) return result;
             if (string.IsNullOrWhiteSpace(password)) return result;
 
-            var user = await _context.tbl_Member.Where(f => f.Account == account && f.Password == password).FirstOrDefaultAsync();
+            var user = await _memberRepository.Entity.Where(f => f.Account == account && f.Password == password).FirstOrDefaultAsync();
             if (user != null)
             {
 
@@ -46,8 +50,8 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Module
                 result.AccessToken = _JwtAuthService.BuildToken(claims);
                 result.RefreshToken = _JwtAuthService.BuildRefreshToken();
 
-                _context.tbl_MemberToken.Add(new tbl_MemberToken { MemberId = user.Id, Token = result.RefreshToken, IssuedAt = DateTime.Now, ExpiresAt = DateTime.Now.AddMinutes(_jwtTokenConfig.RefreshTokenExpiration) });
-                _context.SaveChanges();
+                _memberTokenRepository.Entity.Add(new tbl_MemberToken { MemberId = user.Id, Token = result.RefreshToken, IssuedAt = DateTime.Now, ExpiresAt = DateTime.Now.AddMinutes(_jwtTokenConfig.RefreshTokenExpiration) });
+                _memberTokenRepository.UnitOfWork.SaveChanges();
 
                 result.Success = true;
             };
@@ -64,11 +68,11 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Module
             if (claimsPrincipal == null) return result;
 
             string id = claimsPrincipal.Claims.First(c => c.Type == "id").Value;
-            var user = await _context.tbl_Member.FindAsync(Convert.ToInt32(id));
+            var user = await _memberRepository.Entity.FindAsync(Convert.ToInt32(id));
 
             if (user == null) return result;
 
-            var token = await _context.tbl_MemberToken
+            var token = await _memberTokenRepository.Entity
                     .Where(f => f.MemberId == user.Id
                             && f.Token == tbl_MemberToken
                             && f.ExpiresAt >= DateTime.Now)
@@ -82,9 +86,9 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Module
             result.AccessToken = _JwtAuthService.BuildToken(claims);
             result.RefreshToken = _JwtAuthService.BuildRefreshToken();
 
-            _context.tbl_MemberToken.Remove(token);
-            _context.tbl_MemberToken.Add(new tbl_MemberToken { MemberId = user.Id, Token = result.RefreshToken, IssuedAt = DateTime.Now, ExpiresAt = DateTime.Now.AddMinutes(_jwtTokenConfig.RefreshTokenExpiration) });
-            _context.SaveChanges();
+            _memberTokenRepository.Entity.Remove(token);
+            _memberTokenRepository.Entity.Add(new tbl_MemberToken { MemberId = user.Id, Token = result.RefreshToken, IssuedAt = DateTime.Now, ExpiresAt = DateTime.Now.AddMinutes(_jwtTokenConfig.RefreshTokenExpiration) });
+            _memberTokenRepository.UnitOfWork.SaveChanges();
 
             result.Success = true;
 
