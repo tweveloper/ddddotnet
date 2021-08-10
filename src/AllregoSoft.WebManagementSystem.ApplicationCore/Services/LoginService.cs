@@ -1,6 +1,4 @@
-﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Entities;
-using AllregoSoft.WebManagementSystem.ApplicationCore.Entities.DataTransferObject;
-using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
+﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -21,9 +19,12 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
     public class LoginService : ILoginService
     {
         private readonly IMemberRepository _memberRepository;
-        public LoginService(IMemberRepository memberRepository)
+        private readonly IMemberTokenRepository _membertokenRepository;
+        public LoginService(IMemberRepository memberRepository,
+                IMemberTokenRepository membertoeknRepository)
         {
             _memberRepository = memberRepository;
+            _membertokenRepository = membertoeknRepository;
         }
 
         /// <summary>

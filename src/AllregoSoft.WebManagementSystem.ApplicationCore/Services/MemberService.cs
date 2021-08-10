@@ -3,11 +3,9 @@ using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Transactions;
 
 namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
@@ -15,12 +13,12 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
     public interface IMemberService
     {
         tbl_Member Create(tbl_Member data);
-        //tbl_Member Create(string account, string password);
-        //dynamic MemberList();
-        //tbl_Member MemberInfo(long Id);
-        //JObject AddOrUpdate(JObject data);
-        //dynamic RoleList();
-        //JObject Delete(string[] list);
+        tbl_Member Create(string account, string password);
+        dynamic MemberList();
+        tbl_Member MemberInfo(long Id);
+        JObject AddOrUpdate(JObject data);
+        dynamic RoleList();
+        JObject Delete(string[] list);
     }
     public class MemberService : IMemberService
     {

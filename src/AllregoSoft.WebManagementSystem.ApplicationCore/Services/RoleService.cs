@@ -301,9 +301,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         /// <returns></returns>
         public dynamic GetCRUD(long MemRoleId)
         {
-            var crud = (from x in _rolemappingRepository.Entity.Where(x => x.RoleId == MemRoleId).ToList()
-                        join a in _sitemapRepository.Entity.Where(a => a.State == "0" && a.Active == true).ToList() on x.SiteMapId equals a.Id into _a
-                        from a in _a.DefaultIfEmpty()
+            var crud = (from x in _rolemappingRepository.Entity.Where(x => x.RoleId == MemRoleId)
+                        join a in _sitemapRepository.Entity.Where(a => a.State == "0" && a.Active == true) on x.SiteMapId equals a.Id
                         select new
                         {
                             Id = x.SiteMapId,
