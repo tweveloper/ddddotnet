@@ -37,7 +37,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         }
         public tbl_Member Create(tbl_Member data)
         {
-            _memberRepository.Entity.Add(data);
+            _memberRepository.UnitOfWork.Add(data);
 
             return data;
         }
@@ -51,7 +51,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                 Name = account,
                 UseYN = "Y"
             };
-            _memberRepository.Entity.Add(member);
+            _memberRepository.UnitOfWork.Add(member);
             _memberRepository.UnitOfWork.SaveChanges();
 
             return member;
@@ -92,7 +92,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         /// <returns></returns>
         public tbl_Member MemberInfo(long Id)
         {
-            var data = _context.tbl_Member.Where(x => x.Id == Id).FirstOrDefault();
+            var data = _memberRepository.Entity.Where(x => x.Id == Id).FirstOrDefault();
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -111,11 +111,11 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
 
             try
             {
-                var persist = _context.tbl_Member.Where(x => x.Id == Convert.ToInt32(data["Id"])).FirstOrDefault();
+                var persist = _memberRepository.Entity.Where(x => x.Id == Convert.ToInt32(data["Id"])).FirstOrDefault();
 
                 using (var transaction = new TransactionScope())
                 {
-                    var valid = _context.tbl_Member.Where(x => x.Account == data["Account"].ToString()).Count();
+                    var valid = _memberRepository.Entity.Where(x => x.Account == data["Account"].ToString()).Count();
 
                     if (persist == null)
                     {
@@ -139,7 +139,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                         persist.RoleId = Convert.ToInt32(data["RoleId"]);
                         persist.RegMemId = 1;
                         persist.RegDate = DateTime.Now;
-                        _context.tbl_Member.Add(persist);
+                        _memberRepository.Entity.Add(persist);
                     }
                     else
                     {
@@ -159,9 +159,9 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                         persist.ModDate = DateTime.Now;
 
                         //변경 될 Data 작업 목록에 추가
-                        _context.tbl_Member.Update(persist);
+                        _memberRepository.Entity.Update(persist);
                     }
-                    _context.SaveChanges();
+                    _memberRepository.UnitOfWork.SaveChanges();
                     transaction.Complete();
                 }
                 result.Add("result", "true");
@@ -185,7 +185,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         /// <returns></returns>
         public dynamic RoleList()
         {
-            var RoleList = (from x in _context.tbl_Role
+            var RoleList = (from x in _roleRepository.Entity
                             where x.State == "0"
                             select new
                             {
@@ -213,14 +213,14 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                 {
                     foreach (string id in list)
                     {
-                        tbl_Member mem = _context.tbl_Member.Where(x => x.Id == Convert.ToInt32(id)).FirstOrDefault();
+                        tbl_Member mem = _memberRepository.Entity.Where(x => x.Id == Convert.ToInt32(id)).FirstOrDefault();
                         mem.UseYN = "N";
-                        _context.tbl_Member.Update(mem);
+                        _memberRepository.Entity.Update(mem);
                     }
                     result.Add("result", "true");
                     result.Add("message", "");
 
-                    _context.SaveChanges();
+                    _memberRepository.UnitOfWork.SaveChanges();
                     transaction.Complete();
                 }
             }

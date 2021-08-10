@@ -37,8 +37,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         }
         public tbl_SiteMap Create(tbl_SiteMap data)
         {
-            _sitemapRepository.Add(data);
-            _sitemapRepository.SaveChanges();
+            _sitemapRepository.UnitOfWork.Add(data);
+            _sitemapRepository.UnitOfWork.SaveChanges();
 
             return data;
         }
@@ -52,8 +52,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                 //Name = account,
                 //UseYN = "Y"
             };
-            _sitemapRepository.Add(sitemap);
-            _sitemapRepository.SaveChanges();
+            _sitemapRepository.UnitOfWork.Add(sitemap);
+            _sitemapRepository.UnitOfWork.SaveChanges();
 
             return sitemap;
         }
@@ -64,7 +64,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         /// <returns></returns>
         public dynamic SiteMapList()
         {
-            var SiteMapList = (from x in _sitemapRepository.GetAll()
+            var SiteMapList = (from x in _sitemapRepository.Entity
                                select new
                                {
                                    x.Id,
@@ -86,7 +86,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         /// <returns></returns>
         public JObject SiteMapInfo(long Id)
         {
-            var query = _sitemapRepository.GetAll().Where(x => x.Id == Id && x.State == "0").FirstOrDefault();
+            var query = _sitemapRepository.Entity.Where(x => x.Id == Id && x.State == "0").FirstOrDefault();
 
             return JObject.Parse(JsonConvert.SerializeObject(query));
         }
@@ -108,7 +108,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                     //Root Node가 없을 경우 에러 발생
                     try
                     {
-                        pos = _sitemapRepository.GetAll().Where(x => x.State == "0" && x.Parent == 0).Max(x => x.Position);
+                        pos = _sitemapRepository.Entity.Where(x => x.State == "0" && x.Parent == 0).Max(x => x.Position);
                     }
                     catch { }
 
@@ -122,8 +122,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                     tsm.RegDate = DateTime.Now;
 
                     //변경 될 Data 작업 목록에 추가
-                    _sitemapRepository.Add(tsm);
-                    _sitemapRepository.SaveChanges();
+                    _sitemapRepository.UnitOfWork.Add(tsm);
+                    _sitemapRepository.UnitOfWork.SaveChanges();
                     transaction.Complete();
                 }
                 result.Add("result", "true");
@@ -158,7 +158,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                     //변경한 sitemap을 제외한 데이터 불러오기
                     if (parent == old_parent)
                     {
-                        var SiteMap = _sitemapRepository.GetAll().Where(x => x.State == "0"
+                        var SiteMap = _sitemapRepository.Entity.Where(x => x.State == "0"
                             && x.Parent == parent && !x.Id.ToString().Contains(id.ToString())).OrderBy(x => x.Position).ToList();
 
                         //Position 변경
@@ -172,12 +172,12 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                             else
                                 SiteMap[i].Position = (i + 2);
 
-                            _sitemapRepository.Update(SiteMap[i]);
+                            _sitemapRepository.UnitOfWork.Update(SiteMap[i]);
                         }
                     }
                     else
                     {
-                        var SiteMap = _sitemapRepository.GetAll().Where(x => x.State == "0" && x.Parent == parent).OrderBy(x => x.Position).ToList();
+                        var SiteMap = _sitemapRepository.Entity.Where(x => x.State == "0" && x.Parent == parent).OrderBy(x => x.Position).ToList();
 
                         //New Position 변경
                         for (int i = 0; i < SiteMap.Count(); i++)
@@ -190,10 +190,10 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                             else
                                 SiteMap[i].Position = (i + 2);
 
-                            _sitemapRepository.Update(SiteMap[i]);
+                            _sitemapRepository.UnitOfWork.Update(SiteMap[i]);
                         }
 
-                        SiteMap = _sitemapRepository.GetAll().Where(x => x.State == "0" && x.Parent == old_parent
+                        SiteMap = _sitemapRepository.Entity.Where(x => x.State == "0" && x.Parent == old_parent
                             && !x.Id.ToString().Contains(id.ToString())).OrderBy(x => x.Position).ToList();
 
                         //Old Position 변경
@@ -202,11 +202,11 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                             SiteMap[i].ModMemId = 1; //임시고정
                             SiteMap[i].ModDate = DateTime.Now;
                             SiteMap[i].Position = (i + 1);
-                            _sitemapRepository.Update(SiteMap[i]);
+                            _sitemapRepository.UnitOfWork.Update(SiteMap[i]);
                         }
                     }
 
-                    var origin = _sitemapRepository.GetAll().Where(x => x.Id == id).FirstOrDefault();
+                    var origin = _sitemapRepository.Entity.Where(x => x.Id == id).FirstOrDefault();
                     origin.Position = new_pos;
                     origin.Parent = parent;
                     origin.Depth = Convert.ToInt32(data["depth"]);
@@ -214,8 +214,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                     origin.ModDate = DateTime.Now;
                     //origin.Depth = parent == 0 ? 1 : 2;
 
-                    _sitemapRepository.Update(origin);
-                    _sitemapRepository.SaveChanges();
+                    _sitemapRepository.UnitOfWork.Update(origin);
+                    _sitemapRepository.UnitOfWork.SaveChanges();
                     transaction.Complete();
                 }
                 result.Add("result", "true");
@@ -240,7 +240,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
 
             try
             {
-                var persist = _sitemapRepository.GetAll().Where(x => x.Id == data.Id).FirstOrDefault();
+                var persist = _sitemapRepository.Entity.Where(x => x.Id == data.Id).FirstOrDefault();
 
                 using (var transaction = new TransactionScope())
                 {
@@ -250,8 +250,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                     persist.ModMemId = 1; //임시고정
                     persist.ModDate = DateTime.Now;
 
-                    _sitemapRepository.Update(persist);
-                    _sitemapRepository.SaveChanges();
+                    _sitemapRepository.UnitOfWork.Update(persist);
+                    _sitemapRepository.UnitOfWork.SaveChanges();
                     transaction.Complete();
                 }
                 result.Add("result", "true");
@@ -288,12 +288,12 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                         {
                             if (data["parent"].ToString() == "#")
                             {
-                                pos = _sitemapRepository.GetAll().Where(x => x.State == "0" && x.Parent == 0).Max(x => x.Position);
+                                pos = _sitemapRepository.Entity.Where(x => x.State == "0" && x.Parent == 0).Max(x => x.Position);
                                 data["parent"] = "0";
                             }
                             else
                             {
-                                pos = _sitemapRepository.GetAll().Where(x => x.State == "0" && x.Parent == Convert.ToInt32(data["parent"])).Max(x => x.Position);
+                                pos = _sitemapRepository.Entity.Where(x => x.State == "0" && x.Parent == Convert.ToInt32(data["parent"])).Max(x => x.Position);
                             }
                         }
                         catch { }
@@ -306,18 +306,18 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                         persist.State = "0";
                         persist.RegMemId = 1; //임시고정
                         persist.RegDate = DateTime.Now;
-                        _sitemapRepository.Add(persist);
+                        _sitemapRepository.UnitOfWork.Add(persist);
                     }
                     else
                     {
-                        persist = _sitemapRepository.GetAll().Where(x => x.Id == Convert.ToInt32(data["id"])).FirstOrDefault();
+                        persist = _sitemapRepository.Entity.Where(x => x.Id == Convert.ToInt32(data["id"])).FirstOrDefault();
                         persist.Name = data["name"].ToString();
                         persist.ModMemId = 1; //임시고정
                         persist.ModDate = DateTime.Now;
-                        _sitemapRepository.Update(persist);
+                        _sitemapRepository.UnitOfWork.Update(persist);
                     }
                     //변경 될 Data 작업 목록에 추가
-                    _sitemapRepository.SaveChanges();
+                    _sitemapRepository.UnitOfWork.SaveChanges();
                     transaction.Complete();
                 }
                 result.Add("result", "true");
@@ -344,11 +344,11 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
             {
                 using (var transaction = new TransactionScope())
                 {
-                    var persist = _sitemapRepository.GetAll().Where(x => x.Id == Convert.ToInt32(data["id"])).FirstOrDefault();
+                    var persist = _sitemapRepository.Entity.Where(x => x.Id == Convert.ToInt32(data["id"])).FirstOrDefault();
                     persist.State = "1";
-                    _sitemapRepository.Update(persist);
+                    _sitemapRepository.UnitOfWork.Update(persist);
 
-                    var SiteMap = _sitemapRepository.GetAll().Where(x => x.State == "0" && x.Parent == persist.Parent
+                    var SiteMap = _sitemapRepository.Entity.Where(x => x.State == "0" && x.Parent == persist.Parent
                         && !x.Id.ToString().Contains(persist.Id.ToString())).OrderBy(x => x.Position).ToList();
 
                     //Position 변경
@@ -357,10 +357,10 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                         SiteMap[i].ModMemId = 1; //임시고정
                         SiteMap[i].ModDate = DateTime.Now;
                         SiteMap[i].Position = (i + 1);
-                        _sitemapRepository.Update(SiteMap[i]);
+                        _sitemapRepository.UnitOfWork.Update(SiteMap[i]);
                     }
                     //변경 될 Data 작업 목록에 추가
-                    _sitemapRepository.SaveChanges();
+                    _sitemapRepository.UnitOfWork.SaveChanges();
                     transaction.Complete();
                 }
                 result.Add("result", "true");
@@ -381,8 +381,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         /// <returns></returns>
         public dynamic RoleSiteMapGet(long Id)
         {
-            var SecondDepthList = (from x in _rolemappingRepository.AsQueryable().Where(x => x.RoleId == Id)
-                                   join a in _sitemapRepository.AsQueryable().Where(a => a.State == "0" && a.Active == true) on x.SiteMapId equals a.Id into _a
+            var SecondDepthList = (from x in _rolemappingRepository.Entity.Where(x => x.RoleId == Id)
+                                   join a in _sitemapRepository.Entity.Where(a => a.State == "0" && a.Active == true) on x.SiteMapId equals a.Id into _a
                                    from a in _a.DefaultIfEmpty()
                                    select new
                                    {
@@ -396,8 +396,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                                        Active = ""
                                    }).Where(x => x.Depth == 2).OrderBy(x => x.Id).ThenBy(x => x.Position).ToList();
 
-            var ThirdDepthList = (from x in _rolemappingRepository.AsQueryable().Where(x => x.RoleId == Id)
-                                  join a in _sitemapRepository.AsQueryable().Where(a => a.State == "0" && a.Active == true) on x.SiteMapId equals a.Id into _a
+            var ThirdDepthList = (from x in _rolemappingRepository.Entity.Where(x => x.RoleId == Id)
+                                  join a in _sitemapRepository.Entity.Where(a => a.State == "0" && a.Active == true) on x.SiteMapId equals a.Id into _a
                                   from a in _a.DefaultIfEmpty()
                                   select new
                                   {
@@ -414,7 +414,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
             var RoleSiteMapList1 = SecondDepthList.GroupBy(item => item.Parent)
                                     .Select(group => new {
                                         group.Key,
-                                        ParentMap = _sitemapRepository.GetAll()
+                                        ParentMap = _sitemapRepository.Entity
                                             .Where(x => x.Id == group.Key && x.State == "0" && x.Active == true)
                                             .Select(x => new { x.Name, x.Position, Active = "" })
                                             .FirstOrDefault(),

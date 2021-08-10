@@ -41,7 +41,7 @@ namespace AllregoSoft.WebManagementSystem.WebApplication
             appSettings["ApiDomain"] = appSettings["ApiTestDomain"];
 #endif
             services.AddControllersWithViews().AddSessionStateTempDataProvider();
-            services.AddRazorPages().AddSessionStateTempDataProvider();
+            services.AddRazorPages().AddSessionStateTempDataProvider().AddRazorRuntimeCompilation();
             services.AddSingleton<TempDataSerializer, JsonTempDataSerializer>();
             //for cookies
             services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();

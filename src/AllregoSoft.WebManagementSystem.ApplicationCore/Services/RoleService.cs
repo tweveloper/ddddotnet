@@ -54,8 +54,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                 //Name = account,
                 //UseYN = "Y"
             };
-            _roleRepository.Add(Role);
-            _roleRepository.SaveChanges();
+            _roleRepository.UnitOfWork.Add(Role);
+            _roleRepository.UnitOfWork.SaveChanges();
 
             return Role;
         }
@@ -66,7 +66,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         /// <returns></returns>
         public dynamic RoleList()
         {
-            var SiteMapList = (from x in _roleRepository.GetAll()
+            var SiteMapList = (from x in _roleRepository.Entity
                                select new { x.Id, x.Name, x.State }).Where(x => x.State == "0")
                               .OrderBy(x => x.Id).ToList();
 
@@ -79,8 +79,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         /// <returns></returns>
         public dynamic Role_SiteMapList(long Id)
         {
-            var SiteMapList = (from x in _sitemapRepository.GetAll()
-                               join a in _rolemappingRepository.GetAll().Where(x => x.RoleId == Id) on x.Id equals a.SiteMapId into _a
+            var SiteMapList = (from x in _sitemapRepository.Entity
+                               join a in _rolemappingRepository.Entity.Where(x => x.RoleId == Id) on x.Id equals a.SiteMapId into _a
                                from b in _a.DefaultIfEmpty()
                                select new
                                {
@@ -89,7 +89,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                                    Parent = x.Parent == 0 ? "#" : x.Parent.ToString(),
                                    x.Depth,
                                    x.Position,
-                                   Selected = b.SiteMapId == x.Id ? (x.Parent == 0 ? false : ((from y in _sitemapRepository.GetAll()
+                                   Selected = b.SiteMapId == x.Id ? (x.Parent == 0 ? false : ((from y in _sitemapRepository.Entity
                                                                         .Where(y => y.State == "0" && y.Active && y.Parent == x.Id && y.Depth == 3)
                                                                                                select y.Id).Count() > 0 ? false : true)) : false,
                                    x.Active,
@@ -100,7 +100,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                                    D = b.D == null ? "" : b.D,
                                    Auth1 = b.Auth1 == null ? "" : b.Auth1,
                                    Auth2 = b.Auth2 == null ? "" : b.Auth2,
-                                   ChildCnt = (from y in _sitemapRepository.GetAll()
+                                   ChildCnt = (from y in _sitemapRepository.Entity
                                                .Where(y => y.State == "0" && y.Active && y.Parent == x.Id && y.Depth == 3)
                                                select y.Id).Count()
                                }).Where(x => x.State == "0" && x.Active)
@@ -121,7 +121,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
             {
                 using (var transaction = new TransactionScope())
                 {
-                    var persist = _roleRepository.GetAll().Where(x => x.Id == Convert.ToInt32(data["Id"])).FirstOrDefault();
+                    var persist = _roleRepository.Entity.Where(x => x.Id == Convert.ToInt32(data["Id"])).FirstOrDefault();
 
                     if (persist == null)
                     {
@@ -130,7 +130,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                         persist.State = "0";
                         persist.RegMemId = 1; //임시고정
                         persist.RegDate = DateTime.Now;
-                        _roleRepository.Add(persist);
+                        _roleRepository.UnitOfWork.Add(persist);
                     }
                     else
                     {
@@ -139,9 +139,9 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                         persist.ModMemId = 1; //임시고정
                         persist.ModDate = DateTime.Now;
                         //변경 될 Data 작업 목록에 추가
-                        _roleRepository.Update(persist);
+                        _roleRepository.UnitOfWork.Update(persist);
                     }
-                    _roleRepository.SaveChanges();
+                    _roleRepository.UnitOfWork.SaveChanges();
                     transaction.Complete();
 
                 }
@@ -167,11 +167,11 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
 
             try
             {
-                var persist = _rolemappingRepository.GetAll().Where(x => x.RoleId == Convert.ToInt32(data["RoleId"]));
+                var persist = _rolemappingRepository.Entity.Where(x => x.RoleId == Convert.ToInt32(data["RoleId"]));
 
                 using (var transaction = new TransactionScope())
                 {
-                    _rolemappingRepository.RemoveRange(persist);
+                    _rolemappingRepository.UnitOfWork.RemoveRange(persist);
 
                     foreach (var RoleMap in data["jstreeMaps"])
                     {
@@ -183,10 +183,10 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                             RoleMapping.RegMemId = 1; //임시고정
                             RoleMapping.RegDate = DateTime.Now;
                             //추가 될 Data 작업 목록에 추가
-                            _rolemappingRepository.Add(RoleMapping);
+                            _rolemappingRepository.UnitOfWork.Add(RoleMapping);
                         }
                     }
-                    _rolemappingRepository.SaveChanges();
+                    _rolemappingRepository.UnitOfWork.SaveChanges();
                     transaction.Complete();
                 }
                 result.Add("result", "true");
@@ -211,7 +211,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
 
             try
             {
-                var persist = _rolemappingRepository.GetAll().Where(x => x.RoleId == Convert.ToInt32(data["RoleId"]));
+                var persist = _rolemappingRepository.Entity.Where(x => x.RoleId == Convert.ToInt32(data["RoleId"]));
                 //CRUD 리셋 후 CRUD 권한 업데이트
                 CRUD_Reset(persist);
 
@@ -226,7 +226,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
 
                         if (!string.IsNullOrEmpty(Role_Map_Id))
                         {
-                            tbl_Role_Mapping RoleMapping = _rolemappingRepository.GetAll()
+                            tbl_Role_Mapping RoleMapping = _rolemappingRepository.Entity
                                 .Where(x => x.RoleId == Convert.ToInt32(data["RoleId"])
                                 && x.SiteMapId == Convert.ToInt32(strId[1])).FirstOrDefault();
 
@@ -248,8 +248,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                                 RoleMapping.D = "Y";
                             }
                             //변경 될 Data 작업 목록에 추가
-                            _rolemappingRepository.Update(RoleMapping);
-                            _rolemappingRepository.SaveChanges();
+                            _rolemappingRepository.UnitOfWork.Update(RoleMapping);
+                            _rolemappingRepository.UnitOfWork.SaveChanges();
                         }
                     }
                     transaction.Complete();
@@ -283,9 +283,9 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                         tmp.R = null;
                         tmp.U = null;
                         tmp.D = null;
-                        _rolemappingRepository.Update(tmp);
+                        _rolemappingRepository.UnitOfWork.Update(tmp);
                     }
-                    _rolemappingRepository.SaveChanges();
+                    _rolemappingRepository.UnitOfWork.SaveChanges();
                     transaction.Complete();
                 }
             }
@@ -301,49 +301,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         /// <returns></returns>
         public dynamic GetCRUD(long MemRoleId)
         {
-            //var rolemapping = (from x in _rolemappingRepository.AsQueryable().Where(x => x.RoleId == MemRoleId)
-            //                   select new { 
-            //                       x.SiteMapId,
-            //                       x.C,
-            //                       x.R,
-            //                       x.U,
-            //                       x.D,
-            //                       x.Auth1,
-            //                       x.Auth2,
-            //                       x.RoleId
-            //                   }).OrderBy(x => x.SiteMapId);
-
-            //var sitemap = (from x in _sitemapRepository.AsQueryable().Where(a => a.State == "0" && a.Active == true)
-            //               select new
-            //               {
-            //                   x.Id,
-            //                   x.Name,
-            //                   x.Position,
-            //                   x.Path,
-            //                   x.Depth
-            //               }).OrderBy(x => x.Position);
-
-            //var crud = (from x in rolemapping
-            //            join a in sitemap on x.SiteMapId equals a.Id into _a
-            //            from a in _a.DefaultIfEmpty()
-            //            select new
-            //            {
-            //                Id = x.SiteMapId,
-            //                a.Name,
-            //                a.Position,
-            //                a.Path,
-            //                x.C,
-            //                x.R,
-            //                x.U,
-            //                x.D,
-            //                x.Auth1,
-            //                x.Auth2,
-            //                a.Depth
-            //            }).Where(x => x.Depth > 1).OrderBy(x => x.Id).ThenBy(x => x.Position).ToList();
-
-
-            var crud = (from x in _rolemappingRepository.AsQueryable().Where(x => x.RoleId == MemRoleId)
-                        join a in _sitemapRepository.AsQueryable().Where(a => a.State == "0" && a.Active == true) on x.SiteMapId equals a.Id into _a
+            var crud = (from x in _rolemappingRepository.Entity.Where(x => x.RoleId == MemRoleId).ToList()
+                        join a in _sitemapRepository.Entity.Where(a => a.State == "0" && a.Active == true).ToList() on x.SiteMapId equals a.Id into _a
                         from a in _a.DefaultIfEmpty()
                         select new
                         {
@@ -356,11 +315,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
                             x.U,
                             x.D,
                             x.Auth1,
-                            x.Auth2,
-                            a.Depth,
-                            x.RoleId,
-                            a.State,
-                            a.Active
+                            x.Auth2
                         }).OrderBy(x => x.Id).ThenBy(x => x.Position).ToList();
 
             return crud;

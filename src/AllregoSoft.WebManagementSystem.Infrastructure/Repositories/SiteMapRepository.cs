@@ -4,7 +4,7 @@ using AllregoSoft.WebManagementSystem.Infrastructure.Context;
 
 namespace AllregoSoft.WebManagementSystem.Infrastructure.Repositories
 {
-    public class SiteMapRepository : EfCoreRepository<tbl_SiteMap, AWMSContext>, ISiteMapRepository
+    public class SiteMapRepository : GenericRepository<tbl_SiteMap, AWMSContext>, ISiteMapRepository
     {
         public SiteMapRepository(AWMSContext context) : base(context) { }
     }
