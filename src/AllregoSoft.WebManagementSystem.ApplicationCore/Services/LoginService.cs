@@ -22,23 +22,14 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         private readonly ILogger<LoginService> _logger;
         private readonly IMemberRepository _memberRepository;
         private readonly IJWTAuthService _jWTAuthService;
-        //private readonly IRoleMappingRepository _rolemappingRepository;
-        //private readonly IRoleRepository _roleRepository;
-        //private readonly ISiteMapRepository _sitemapRepository;
+
         public LoginService(ILogger<LoginService> logger,
                             IMemberRepository memberRepository,
-                            IJWTAuthService jWTAuthService//,
-                            //IRoleMappingRepository rolemappingRepository,
-                            //IRoleRepository roleRepository,
-                            //ISiteMapRepository sitemapRepository
-                            )
+                            IJWTAuthService jWTAuthService)
         {
             _logger = logger;
             _memberRepository = memberRepository;
             _jWTAuthService = jWTAuthService;
-            //_rolemappingRepository = rolemappingRepository;
-            //_roleRepository = roleRepository;
-            //_sitemapRepository = sitemapRepository;
         }
 
         /// <summary>
@@ -48,9 +39,6 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         public string Login(LoginDTO data)
         {
             var user = _memberRepository.Entity.Where(x => x.Account.Equals(data.Account) && x.UseYN.Equals("Y")).FirstOrDefault();
-            //var Role = _roleRepository.Entity.Where(x => x.Id.Equals(user.RoleId)).ToList();
-            //var Mapping = _rolemappingRepository.Entity.Where(x => x.RoleId.Equals(user.RoleId)).ToList();
-            //var SiteMap = _sitemapRepository.Entity.Where(x => x.State.Equals("0") && x.Active == true).ToList();
 
             try
             {

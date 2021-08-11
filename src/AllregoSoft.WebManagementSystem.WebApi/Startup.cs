@@ -42,7 +42,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi
             
             
             // AWMS DbContext 설정
-            services.AddDbContext<AWMSContext>(options => options.UseSqlServer(
+            services.AddDbContext<AWMSContext>(options => options.UseLazyLoadingProxies().UseSqlServer(
                 Configuration.GetConnectionString("AWMSConnection")));
 
             // JWT Config 설정

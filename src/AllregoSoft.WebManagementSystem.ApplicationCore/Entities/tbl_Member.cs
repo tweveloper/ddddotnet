@@ -8,11 +8,6 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
 {
     public partial class tbl_Member : BaseEntity, IAggregateRoot
     {
-        public tbl_Member()
-        {
-            //Role = new HashSet<tbl_Role>();
-        }
-
         /// <summary>
         /// 계정
         /// </summary>

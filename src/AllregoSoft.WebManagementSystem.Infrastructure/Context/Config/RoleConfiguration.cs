@@ -17,9 +17,6 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Context.Config
         public void Configure(EntityTypeBuilder<tbl_Role_Mapping> builder)
         {
             builder.HasKey(e => new { e.Id }).HasName("PK_tbl_Role_Mapping");
-            builder.HasOne(d => d.Role).WithMany(e => e.RoleMapping).HasForeignKey(d => d.RoleId);
-            builder.HasOne(d => d.SiteMap).WithMany(e => e.SiteMapping).HasForeignKey(d => d.SiteMapId);
-            //builder.HasMany("SiteMap").WithMany("RoleMapping");
         }
     }
 }
