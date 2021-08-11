@@ -38,13 +38,13 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Controllers
             if (_webApiHelper.Login(data["Id"].ToString(), data["Pwd"].ToString(), ref strRecv))
             {
                 jRetObj = JObject.Parse(strRecv);
-                TempData["UsrId"] = Convert.ToInt64(jRetObj["Id"]);
+                TempData["UsrId"] = Convert.ToInt64(jRetObj["MemId"]);
                 //TempData["UsrApiId"] = Convert.ToInt32(jRetObj["ApiId"]);
                 TempData["UsrRoleId"] = Convert.ToInt64(jRetObj["RoleId"]);
                 //TempData["UsrAccount"] = Account;
-                TempData["UsrPassword"] = data["Pwd"].ToString();
+                //TempData["UsrPassword"] = data["Pwd"].ToString();
                 //TempData["RoleName"] = Util.GetJsonParse(strRecv, "RoleNm");
-                TempData["UsrName"] = jRetObj["Name"].ToString();
+                //TempData["UsrName"] = jRetObj["Name"].ToString();
                 //ConstantHelper.Password = jRetObj["Password"].ToString();
 
                 if (_webApiHelper.GetSiteMap(TempData["UsrRoleId"].ToString(), ref strRecv))

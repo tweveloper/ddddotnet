@@ -1,5 +1,5 @@
 ﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
-using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -10,6 +10,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
     {
         public tbl_Member()
         {
+            //Role = new HashSet<tbl_Role>();
         }
 
         /// <summary>
@@ -79,8 +80,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
         ///// </summary>
         //public DateTime? ModDate { get; set; }
 
+        [InverseProperty("Member")]
         [ForeignKey("RoleId")]
         public virtual tbl_Role Role { get; set; }
-
     }
 }

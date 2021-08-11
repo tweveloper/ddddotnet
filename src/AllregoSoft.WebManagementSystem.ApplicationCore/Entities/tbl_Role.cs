@@ -6,6 +6,12 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
 {
     public class tbl_Role : BaseEntity, IAggregateRoot
     {
+        public tbl_Role()
+        {
+            RoleMapping = new HashSet<tbl_Role_Mapping>();
+            Member = new HashSet<tbl_Member>();
+        }
+
         /// <summary>
         /// 명칭
         /// </summary>
@@ -14,8 +20,12 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
         /// 상태
         /// </summary>
         public string State { get; set; }
+
         [InverseProperty("Role")]
         public virtual ICollection<tbl_Role_Mapping> RoleMapping { get; set; }
+
+        [InverseProperty("Role")]
+        public virtual ICollection<tbl_Member> Member { get; set; }
 
         ///// <summary>
         ///// 등록자

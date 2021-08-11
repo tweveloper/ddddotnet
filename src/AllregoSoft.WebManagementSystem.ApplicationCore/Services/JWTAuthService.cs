@@ -58,18 +58,27 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
 
             var memberToken = _memberTokenRepository.Entity.Where(x => x.MemberId == member.Id && x.ExpiresAt >= DateTime.Now).FirstOrDefault();
 
-            accessToken = memberToken == null ? BuildToken(BuildClaims(member)) : memberToken.Token;
-
-            _memberTokenRepository.UnitOfWork.Add(new tbl_MemberToken { MemberId = member.Id, Token = accessToken, IssuedAt = DateTime.Now, ExpiresAt = DateTime.Now.AddMinutes(_jwtTokenConfig.RefreshTokenExpiration) });
-            _memberTokenRepository.UnitOfWork.SaveChanges();
+            if(memberToken == null)
+            {
+                accessToken = BuildToken(BuildClaims(member));
+                _memberTokenRepository.UnitOfWork.Add(new tbl_MemberToken { MemberId = member.Id, Token = accessToken, IssuedAt = DateTime.Now, ExpiresAt = DateTime.Now.AddMinutes(_jwtTokenConfig.RefreshTokenExpiration) });
+                _memberTokenRepository.UnitOfWork.SaveChanges();
+            }
+            else
+            {
+                accessToken = memberToken.Token;
+            }
 
             refreshToken = BuildRefreshToken();
+            
             if (member.UseYN.Equals("Y"))
             {
                 isSuccess = true;
             }
 
-            return new TokenResult(isSuccess, member, accessToken, refreshToken);
+            var result = new TokenResult(isSuccess, member, accessToken, refreshToken);
+
+            return result;
         }
 
         public string BuildToken(Claim[] claims)

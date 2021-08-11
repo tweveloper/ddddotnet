@@ -11,7 +11,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities.ValueObjects
 
         public TokenResult(bool isSuccess, tbl_Member tbl_Member, string accessToken, string refreshToken)
         {
-            this.IsSuccess = IsSuccess;
+            this.IsSuccess = isSuccess;
             this.tbl_Member = tbl_Member;
             this.AccessToken = accessToken;
             this.RefreshToken = refreshToken;

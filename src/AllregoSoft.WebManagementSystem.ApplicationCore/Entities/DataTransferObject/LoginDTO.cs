@@ -13,6 +13,8 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities.DataTransferO
         public string Account { get; set; }
         public string Password { get; set; }
         public string Token { get; set; }
+        public long? RoleId { get; set; }
+        public long MemId{ get; set; }
 
         public override string Result()
         {
@@ -20,7 +22,9 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities.DataTransferO
             {
                 IsSuccess,
                 Message,
-                Token
+                Token,
+                RoleId,
+                MemId
             });
         }
     }

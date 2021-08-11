@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
 using System.Text;
@@ -75,15 +76,16 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Helpers
 
                 if (_networkHelper.RestSend("JObjectPost", strUri, Method.POST, jBody, ref strRecv))
                 {
+                    strRecv = strRecv.Replace("\\", "").Replace("\"{", "{").Replace("}\"", "}").Replace(" ", "");
                     JObject job = JObject.Parse(strRecv);
 
-                    if (job["error"] == null)
+                    if (job["IsSuccess"].ToString().ToLower() == "true")
                     {
                         bRet = true;
                     }
                     else
                     {
-                        throw new Exception(job["error"].ToString());
+                        throw new Exception(job["Message"].ToString());
                     }
                 }
             }

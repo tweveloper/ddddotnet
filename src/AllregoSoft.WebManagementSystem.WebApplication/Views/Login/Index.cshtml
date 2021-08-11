@@ -62,7 +62,7 @@
         .then(response => response.json())
         .then(function (data) {
             data = JSON.parse(data);
-            console.log(data);
+            //console.log(data);
             if (data.result == 'true') {
                 //Swal.fire('로그인 성공!');
                 location.href = '@ViewBag.ReturnUrl';

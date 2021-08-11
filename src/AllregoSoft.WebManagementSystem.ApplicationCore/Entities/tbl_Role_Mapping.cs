@@ -1,4 +1,5 @@
 ﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
@@ -37,8 +38,15 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
         /// 메뉴고유번호
         /// </summary>
         public long SiteMapId { get; set; }
+
+        [InverseProperty("SiteMapping")]
+        [ForeignKey("SiteMapId")]
+        public virtual tbl_SiteMap SiteMap { get; set; }
+
         [InverseProperty("RoleMapping")]
+        [ForeignKey("RoleId")]
         public virtual tbl_Role Role { get; set; }
+
         //[Display(Name = "등록자"), Required]
         //public int RegMemId { get; set; }
         //[Display(Name = "등록일시"), Required]

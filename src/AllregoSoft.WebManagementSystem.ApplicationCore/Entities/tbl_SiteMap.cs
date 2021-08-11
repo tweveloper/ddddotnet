@@ -1,10 +1,11 @@
 ﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
 {
     public class tbl_SiteMap : BaseEntity, IAggregateRoot
     {
-
         /// <summary>
         /// 명칭
         /// </summary>
@@ -37,6 +38,10 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Entities
         /// 상태
         /// </summary>
         public string State { get; set; }
+
+        [InverseProperty("SiteMap")]
+        public virtual ICollection<tbl_Role_Mapping> SiteMapping { get; set; }
+
         //[Display(Name = "등록자"), Required]
         //public int RegMemId { get; set; }
         //[Display(Name = "등록일"), Required]
