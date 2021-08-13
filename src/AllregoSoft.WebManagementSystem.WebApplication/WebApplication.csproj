@@ -10,8 +10,6 @@
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <!-- 추가 : 끝 -->
-    <TypeScriptNoEmitOnError>true</TypeScriptNoEmitOnError>
-    <TypeScriptNoImplicitReturns>true</TypeScriptNoImplicitReturns>
   </PropertyGroup>
 
   <ItemGroup>
