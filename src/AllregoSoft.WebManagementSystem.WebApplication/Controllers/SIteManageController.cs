@@ -9,6 +9,7 @@ using System.Diagnostics;
 
 namespace AllregoSoft.WebManagementSystem.WebApplication.Controllers
 {
+    [UserAuthorizationFilter]
     public class SIteManageController : Controller
     {
         public SIteManageController()
