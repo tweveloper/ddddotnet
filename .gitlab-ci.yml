@@ -1,0 +1,32 @@
+stages:
+  - build
+  - deploy
+
+build_job:
+  before_script:
+    - dotnet restore src\AllregoSoft.WebManagementSystem.WebApi\WebApi.csproj
+    - dotnet restore src\AllregoSoft.WebManagementSystem.WebApplication\WebApplication.csproj
+  stage: build
+  only:
+    - develop
+  script:
+    - dotnet msbuild src\AllregoSoft.WebManagementSystem.WebApi\WebApi.csproj /p:DeployOnBuild=true /p:Configuration=Release
+    - dotnet msbuild src\AllregoSoft.WebManagementSystem.WebApplication\WebApplication.csproj /p:DeployOnBuild=true /p:Configuration=Release
+  artifacts:
+    expire_in: 2 days
+    paths:
+      - '.\src\AllregoSoft.WebManagementSystem.WebApi\bin\Release\net5.0\Publish\'
+      - '.\src\AllregoSoft.WebManagementSystem.WebApplication\bin\Release\net5.0\Publish\'
+
+deploy_job:
+  stage: deploy
+  only:
+    - develop
+  script:
+    - 'C:\Windows\System32\inetsrv\appcmd recycle apppool /apppool.name:"Dev.AWMS.WebAPI"'
+    - 'xcopy /y /s ".\src\AllregoSoft.WebManagementSystem.WebApi\bin\Release\net5.0\Publish\*.*" "C:\inetpub\wwwroot\Dev.AWMS.WebAPI"'
+    - 'C:\Windows\System32\inetsrv\appcmd recycle apppool /apppool.name:"Dev.AWMS.WebApplication"'
+    - 'xcopy /y /s ".\src\AllregoSoft.WebManagementSystem.WebApplication\bin\Release\net5.0\Publish\*.*" "C:\inetpub\wwwroot\Dev.AWMS.WebApplication"'
+
+  dependencies:
+    - build_job
