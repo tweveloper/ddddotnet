@@ -61,10 +61,12 @@
         })
         .then(response => response.json())
         .then(function (data) {
-            data = JSON.parse(data);
-            //console.log(data);
-            if (data.result == 'true') {
+            //data = JSON.parse(data);
+            console.log(data.result);
+            if (data.result) {
+                AWUtil.setToken(data.Token);
                 //Swal.fire('로그인 성공!');
+                /*localStorage.setItem('Auth', data.Token);*/
                 location.href = '@ViewBag.ReturnUrl';
             } else {
                 Swal.fire(data.msg);

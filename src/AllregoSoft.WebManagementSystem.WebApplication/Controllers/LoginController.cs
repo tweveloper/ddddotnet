@@ -65,7 +65,7 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Controllers
                 jRetObj.Add("result", "false");
                 jRetObj.Add("msg", strRecv);
             }
-            return Json(JsonConvert.SerializeObject(jRetObj));
+            return Json(jRetObj);
         }
     }
 }
