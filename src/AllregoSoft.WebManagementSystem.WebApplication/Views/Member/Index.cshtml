@@ -86,9 +86,7 @@
                             {
                                 method: 'POST',
                                 body: jsondata,
-                                headers: {
-                                    'Content-Type': 'application/json;'
-                                }
+                                headers: AWUtil.headers('json')
                             })
                             .then(response => response.json())
                             .then(function (data) {

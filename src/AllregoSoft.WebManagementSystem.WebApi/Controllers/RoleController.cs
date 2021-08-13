@@ -1,9 +1,11 @@
 ﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
 namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
 
@@ -20,6 +22,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
         /// 역할 리스트
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("[action]")]
         public ActionResult RoleList()
         {
@@ -79,6 +82,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
         /// CRUD 가져오기
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("[action]")]
         public IActionResult GetCRUD(long MemRoleId)
         {

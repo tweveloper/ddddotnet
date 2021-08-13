@@ -70,9 +70,7 @@
                 {
                     method: 'POST',
                     body: SiteMapCheckData,
-                    headers: {
-                        'Content-Type': 'application/json;'
-                    }
+                    headers: AWUtil.headers('json')
                 })
                 .then(response => response.json())
                 .then(function (data) {
@@ -201,9 +199,7 @@
         fetch('@Startup.appSettings["ApiDomain"]/Role/Role_SiteMapList',
         {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json;'
-            }
+            headers: AWUtil.headers('json')
         })
         .then(response => response.json())
         .then(function (data) {
@@ -230,9 +226,7 @@
         fetch('@Startup.appSettings["ApiDomain"]/Role/Role_SiteMapList?Id=' + Id,
         {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json;'
-            }
+            headers: AWUtil.headers()
         })
         .then(response => response.json())
         .then(function (data) {
@@ -289,9 +283,7 @@
         {
             method: 'POST',
             body: data,
-            headers: {
-                'Content-Type': 'application/json;'
-            }
+            headers: AWUtil.headers('json')
         })
         .then(response => response.json())
         .then(function (data) {
@@ -322,9 +314,7 @@
         {
             method: 'POST',
             body: data,
-            headers: {
-                'Content-Type': 'application/json;'
-            }
+            headers: AWUtil.headers('json')
         })
         .then(response => response.json())
         .then(function (data) {

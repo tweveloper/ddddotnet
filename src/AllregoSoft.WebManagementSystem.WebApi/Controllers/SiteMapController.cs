@@ -1,10 +1,12 @@
 ﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Entities;
 using AllregoSoft.WebManagementSystem.ApplicationCore.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
 namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
 
@@ -98,6 +100,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
         /// 역할별 메뉴 리스트
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("[action]")]
         public IActionResult Get(int MemRoleId)
         {

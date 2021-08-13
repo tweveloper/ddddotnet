@@ -16,9 +16,7 @@
         fetch('@Startup.appSettings["ApiDomain"]/SiteMap/SiteMapList',
             {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json;'
-                }
+                headers: AWUtil.headers('json')
             })
             .then(response => response.json())
             .then(function (data) {
@@ -138,9 +136,7 @@
                         {
                             method: 'POST',
                             body: jsondata,
-                            headers: {
-                                'Content-Type': 'application/json;'
-                            }
+                            headers: AWUtil.headers('json')
                         })
                         .then(response => response.json())
                         .then(function (data) {
@@ -166,9 +162,7 @@
                         {
                             method: 'POST',
                             body: jsondata,
-                            headers: {
-                                'Content-Type': 'application/json;'
-                            }
+                            headers: AWUtil.headers('json')
                         })
                         .then(response => response.json())
                         .then(function (data) {
@@ -193,9 +187,7 @@
                         {
                             method: 'POST',
                             body: jsondata,
-                            headers: {
-                                'Content-Type': 'application/json;'
-                            }
+                            headers: AWUtil.headers('json')
                         })
                         .then(response => response.json())
                         .then(function (data) {
@@ -222,9 +214,7 @@
                         {
                             method: 'POST',
                             body: jsondata,
-                            headers: {
-                                'Content-Type': 'application/json;'
-                            }
+                            headers: AWUtil.headers('json')
                         })
                         .then(response => response.json())
                         .then(function (data) {
@@ -255,9 +245,7 @@
                     {
                         method: 'POST',
                         body: data,
-                        headers: {
-                            'Content-Type': 'application/json;'
-                        }
+                        headers: AWUtil.headers('json')
                     })
                     .then(response => response.json())
                     .then(function (data) {
@@ -323,9 +311,7 @@
         {
             method: 'POST',
             body: data,
-            headers: {
-                'Content-Type': 'application/json;'
-            }
+            headers: AWUtil.headers('json')
         })
         .then(response => response.json())
         .then(function (data) {

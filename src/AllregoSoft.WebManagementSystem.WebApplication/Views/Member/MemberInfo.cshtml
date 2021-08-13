@@ -24,9 +24,7 @@
             {
                 method: 'POST',
                 body: JSON.stringify({ Id: $('#Id').attr('data-Id') }),
-                headers: {
-                    'Content-Type': 'application/json;'
-                }
+                headers: AWUtil.headers('json')
             })
             .then(response => response.json())
             .then(function (data) {
@@ -72,9 +70,7 @@
         fetch('@Startup.appSettings["ApiDomain"]/Member/RoleList',
         {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json;'
-            }
+            headers: AWUtil.headers('json')
         })
         .then(response => response.json())
         .then(function (data) {
@@ -101,9 +97,7 @@
         {
             method: 'POST',
             body: data,
-            headers: {
-                'Content-Type': 'application/json;'
-            }
+            headers: AWUtil.headers('json')
         })
         .then(response => response.json())
         .then(function (data) {

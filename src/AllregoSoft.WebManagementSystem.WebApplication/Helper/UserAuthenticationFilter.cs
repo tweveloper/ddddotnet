@@ -27,7 +27,7 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Filters
             var cad = (Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)filterContext.ActionDescriptor;
             var allow = cad.ControllerTypeInfo.GetCustomAttributes(typeof(IAllowAnonymous), true).Any() || cad.MethodInfo.GetCustomAttributes(typeof(IAllowAnonymous), true).Any();
             //예외 경로 추가
-            string[] ExName = new string[] { "/Member/MemberInfo"};
+            string[] ExName = new string[] { "/Member/MemberInfo" };
             string CtrlName = controller.ControllerContext.RouteData.Values["controller"].ToString();
             string ActName = controller.ControllerContext.RouteData.Values["action"].ToString();
 

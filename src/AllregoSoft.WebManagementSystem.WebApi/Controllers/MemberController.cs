@@ -1,10 +1,12 @@
 ﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System;
 
 namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
 
@@ -32,6 +34,8 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
         /// 회원 목록
         /// </summary>
         /// <returns></returns>
+
+        [AllowAnonymous]
         [HttpGet("[action]")]
         public ActionResult MemberList()
         {
