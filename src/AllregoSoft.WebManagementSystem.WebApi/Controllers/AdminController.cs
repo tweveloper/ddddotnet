@@ -5,6 +5,7 @@ using AllregoSoft.WebManagementSystem.WebApi.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
@@ -30,7 +31,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
                                 IDotnetService dotnetService,
                                 IJWTAuthService jWTAuthService,
                                 SignInManager signInManager,
-                                AppSettings appSettings,
+                                IOptions<AppSettings> appSettings,
                                 ILoginService loginService)
         {
             _logger = logger;
@@ -39,7 +40,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
             _dotnetService = dotnetService;
             _jWTAuthService = jWTAuthService;
             _signInManager = signInManager;
-            _appSettings = appSettings;
+            _appSettings = appSettings.Value;
             _loginService = loginService;
         }
 

@@ -165,6 +165,22 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
             return result;
         }
 
+        private string GetSiteState(ObjectState state)
+        {
+            string result = string.Empty;
+            try
+            {
+                result = state.ToString();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogDebug(ex.Message);
+                result = ex.Message;
+            }
+
+            return result;
+        }
+
         public void RemoveSite(string domain)
         {
             try

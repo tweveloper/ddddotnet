@@ -1,4 +1,5 @@
 ﻿using AllregoSoft.WebManagementSystem.WebApplication.Filters;
+using AllregoSoft.WebManagementSystem.WebApplication.Helper;
 using AllregoSoft.WebManagementSystem.WebApplication.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -56,6 +57,8 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Controllers
                     TempData["SiteMap"] = null;
                 }
                 TempData.Keep();
+
+                SiteHelper.CurrentSession.SetString("Token", jRetObj["Token"].ToString());
 
                 _roleSite.GetCRUD(TempData["UsrRoleId"].ToString(), TempData);
                 jRetObj.Add("result", "true");

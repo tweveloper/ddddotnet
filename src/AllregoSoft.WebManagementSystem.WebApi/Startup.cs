@@ -165,7 +165,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AllregoSoft.WebManagementSystem.WebApi v1"));
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
             

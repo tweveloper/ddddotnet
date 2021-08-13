@@ -1,6 +1,6 @@
 ﻿/************************************************************************************
- * AllregoSoft javascript utilities
- *  - AllregoSoft Javascript Utility
+ * AWUtil javascript utilities
+ *  - AllregoSoft Web Management System Javascript Utility
  *  - fetch api header
  *  - localstorage get set
  *  - 
@@ -65,7 +65,7 @@ var AWUtil = (function () {
                 requestHeaders.append('Content-Type', 'application/json');
                 break;
         }
-
+        console.log(`get headers : ${requestHeaders}`);
         return requestHeaders;
     }
 

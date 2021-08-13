@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AllregoSoft.WebManagementSystem.WebApplication.Model
 {
-    public class appSettings
+    public class AppSettings
     {
         public string ApiDomain { get; set; }
         public string ApiTestDomain { get; set; }
