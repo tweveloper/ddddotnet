@@ -1,10 +1,13 @@
-﻿using AllregoSoft.WebManagementSystem.WebApplication.Controllers;
+﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Entities;
+using AllregoSoft.WebManagementSystem.WebApplication.Controllers;
 using AllregoSoft.WebManagementSystem.WebApplication.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
+using System;
 using System.Linq;
+using System.Security.Claims;
 
 namespace AllregoSoft.WebManagementSystem.WebApplication.Filters
 {
@@ -24,7 +27,7 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Filters
             var cad = (Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)filterContext.ActionDescriptor;
             var allow = cad.ControllerTypeInfo.GetCustomAttributes(typeof(IAllowAnonymous), true).Any() || cad.MethodInfo.GetCustomAttributes(typeof(IAllowAnonymous), true).Any();
             //예외 경로 추가
-            string[] ExName = new string[] { "/Member/MemberInfo", "/Login/Authenticate" };
+            string[] ExName = new string[] { "/Member/MemberInfo"};
             string CtrlName = controller.ControllerContext.RouteData.Values["controller"].ToString();
             string ActName = controller.ControllerContext.RouteData.Values["action"].ToString();
 
@@ -52,20 +55,6 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Filters
                         if (path.Equals("/" + CtrlName + "/" + ActName))
                         {
                             value = true;
-
-                            if (path == "/Login/Authenticate")
-                            {
-                                filterContext.Result = new RedirectResult(filterContext.HttpContext.Request.Path);
-                            }
-                            else
-                            {
-                                _roleSite.CheckAuth("/" + CtrlName, TempData);
-
-                                if (string.IsNullOrEmpty(TempData["U"].ToString()))
-                                {
-                                    filterContext.Result = new RedirectResult("/Home/NotAuth");
-                                }
-                            }
                             break;
                         }
                     }
@@ -81,15 +70,15 @@ namespace AllregoSoft.WebManagementSystem.WebApplication.Filters
                             }
                         }
                     }
-                    //else
-                    //{
-                    //    _roleSite.CheckAuth("/" + CtrlName, TempData);
-                    //
-                    //    if (string.IsNullOrEmpty(TempData["U"].ToString()))
-                    //    {
-                    //        filterContext.Result = new RedirectResult("/Home/NotAuth");
-                    //    }
-                    //}
+                    else
+                    {
+                        _roleSite.CheckAuth("/" + CtrlName, TempData);
+
+                        if (string.IsNullOrEmpty(TempData["U"].ToString()))
+                        {
+                            filterContext.Result = new RedirectResult("/Home/NotAuth");
+                        }
+                    }
                 }
                 else
                 {
