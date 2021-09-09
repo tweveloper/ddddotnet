@@ -1,0 +1,39 @@
+﻿@model AllregoSoft.WebManagementSystem.WebApi.Identity.Models.AccountViewModels.LoginViewModel
+
+<div class="blankpage-form-field">
+    <div class="page-logo m-0 w-100 align-items-center justify-content-center rounded border-bottom-left-radius-0 border-bottom-right-radius-0 px-4">
+        <a href="javascript:void(0)" class="page-logo-link press-scale-down d-flex align-items-center">
+            <img src="~/images/logo.png" alt="AllregoSoft WebManagement Servcie" aria-roledescription="logo">
+            <span class="page-logo-text mr-1">AWMS</span>
+            @*<i class="fal fa-angle-down d-inline-block ml-1 fs-lg color-primary-300"></i>*@
+        </a>
+    </div>
+    <div class="card p-4 border-top-left-radius-0 border-top-right-radius-0">
+        <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+            <div class="form-group">
+                <label class="form-label" for="username">Email</label>
+                <input type="email" id="Email" name="Email" class="form-control" placeholder="your id or email">
+                <span class="help-block">
+                    Your unique email to app
+                </span>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="Password">Password</label>
+                <input type="password" id="Password" name="Password" class="form-control" placeholder="password">
+                <span class="help-block">
+                    Your password
+                </span>
+            </div>
+            <div class="form-group text-left">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="RememberMe" name="RememberMe">
+                    <label class="custom-control-label" for="RememberMe"> Remember me for the next 30 days</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-default float-right">login</button>
+        </form>
+    </div>
+    <div class="blankpage-footer text-center">
+        <a href="#"><strong>Recover Password</strong></a> | <a href="#"><strong>Register Account</strong></a>
+    </div>
+</div>

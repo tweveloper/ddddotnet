@@ -1,26 +1,25 @@
-using AllregoSoft.WebManagementSystem.ApplicationCore.Entities;
+using AllregoSoft.WebManagementSystem.ApplicationCore;
 using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
-using AllregoSoft.WebManagementSystem.Infrastructure.Context;
-using AllregoSoft.WebManagementSystem.WebApi.Helper;
+using AllregoSoft.WebManagementSystem.Infrastructure;
+using AllregoSoft.WebManagementSystem.WebApi.Filters;
+using AllregoSoft.WebManagementSystem.WebApi.Module;
+using AllregoSoft.WebManagementSystem.WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.WebEncoders;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
-using Serilog;
 using System;
-using System.Text;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
-using AllregoSoft.WebManagementSystem.Infrastructure.Repositories;
 
 namespace AllregoSoft.WebManagementSystem.WebApi
 {
@@ -36,39 +35,179 @@ namespace AllregoSoft.WebManagementSystem.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //// 인증 DbContext 설정
-            //services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(
-            //    Configuration.GetConnectionString("AppIdentityConnection")));
-            
-            
-            // AWMS DbContext 설정
-            services.AddDbContext<AWMSContext>(options => options.UseLazyLoadingProxies().UseSqlServer(
-                Configuration.GetConnectionString("AWMSConnection")));
+            services.AddApplicationCore();
+            services.AddInfrastructure(Configuration);
+            services.AddCustomSwagger(Configuration);
+            services.AddCustomMvc();
+            services.AddCustomIntegrations(Configuration);
+            services.AddCustomConfiguration(Configuration);
+            services.AddCustomAuthentication(Configuration);
 
-            // JWT Config 설정
-            var jwtTokenConfig = Configuration.GetSection("jwt").Get<JwtTokenConfig>();
-            services.AddSingleton(jwtTokenConfig);
+            //services.AddDatabaseDeveloperPageExceptionFilter();
 
-            // API JWT 인증 설정
-            services.AddAuthentication(x =>
+            //services.AddSingleton<ICurrentUserService, CurrentUserService>();
+
+            //services.AddHttpContextAccessor();
+
+            //services.Configure<WebEncoderOptions>(options => {
+            //    options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All); // 한글이 인코딩되는 문제 해결
+            //});
+
+
+            //services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))
+            //    .AddNewtonsoftJson(options =>
+            //    {
+            //        options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            //        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            //        //options.SerializerSettings.MaxDepth = 2;
+            //    });
+
+            //services.AddSwaggerGen(c =>
+            //{
+            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "AllregoSoft.WebManagementSystem.WebApi", Version = "v1" });
+
+            //    var securityScheme = new OpenApiSecurityScheme
+            //    {
+            //        Name = "JWT Authentication",
+            //        Description = "Enter JWT Bearer token **_only_**",
+            //        In = ParameterLocation.Header,
+            //        Type = SecuritySchemeType.Http,
+            //        Scheme = "bearer", // must be lower case
+            //        BearerFormat = "JWT",
+            //        Reference = new OpenApiReference
+            //        {
+            //            Id = JwtBearerDefaults.AuthenticationScheme,
+            //            Type = ReferenceType.SecurityScheme
+            //        }
+            //    };
+            //    c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+            //    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            //    {
+            //        {securityScheme, new string[] { }}
+            //    });
+
+            //    // _OR_ enable the annotations on Controller classes [SwaggerTag], if no class comments present
+            //    c.EnableAnnotations();
+            //});
+
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //    .AddIdentityServerAuthentication(options =>
+            //    {
+            //        options.ApiName = "awms.api";
+            //        options.Authority = "https://localhost:44390";
+            //    });
+
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
             {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
+                app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AllregoSoft.WebManagementSystem.WebApi v1"));
+            }
+
+            app.UseHttpsRedirection();
+
+            app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
+            app.UseEndpoints(endpoints =>
             {
-                x.RequireHttpsMetadata = true;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
+                endpoints.MapControllers();
+            });
+        }
+    }
+
+    static class CustomExtensionsMethods 
+    { 
+        public static IServiceCollection AddCustomIntegrations(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddTransient<IIdentityService, IdentityService>();
+            //services.AddSingleton<ICurrentUserService, CurrentUserService>();
+            
+            //services.AddHttpContextAccessor();
+
+            return services;
+        }
+
+        public static IServiceCollection AddCustomMvc(this IServiceCollection services)
+        {
+            // Add framework services.
+            services.AddControllers(options =>
+            {
+                options.Filters.Add(new HttpResponseExceptionFilter());
+                options.Filters.Add(typeof(HttpGlobalExceptionFilter));
+            }).AddNewtonsoftJson(options => 
                 {
-                    ValidateIssuer = true,
-                    ValidIssuer = jwtTokenConfig.Issuer,
-                    ValidateAudience = true,
-                    ValidAudience = jwtTokenConfig.Audience,
-                    ValidateIssuerSigningKey = true,
-                    RequireExpirationTime = false,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtTokenConfig.Secret))
+                    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                    //options.SerializerSettings.MaxDepth = 2;
+                });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                    .SetIsOriginAllowed((host) => true)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection AddCustomAuthentication(this IServiceCollection services, IConfiguration configuration)
+        {
+            // prevent from mapping "sub" claim to nameidentifier.
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub");
+
+            var identityUrl = configuration.GetValue<string>("IdentityUrl");
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            }).AddJwtBearer(options =>
+            {
+                options.Authority = identityUrl;
+                options.RequireHttpsMetadata = false;
+                //options.Audience = "orders";
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection AddCustomConfiguration(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddOptions();
+            services.Configure<AppSettings>(configuration);
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var problemDetails = new ValidationProblemDetails(context.ModelState)
+                    {
+                        Instance = context.HttpContext.Request.Path,
+                        Status = StatusCodes.Status400BadRequest,
+                        Detail = "Please refer to the errors property for additional details."
+                    };
+
+                    return new BadRequestObjectResult(problemDetails)
+                    {
+                        ContentTypes = { "application/problem+json", "application/problem+xml" }
+                    };
                 };
             });
 
@@ -76,43 +215,40 @@ namespace AllregoSoft.WebManagementSystem.WebApi
                 options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All); // 한글이 인코딩되는 문제 해결
             });
 
-            services.Configure<ApiBehaviorOptions>(options => {
-                options.SuppressModelStateInvalidFilter = true;
-            });
+            return services;
+        }
 
-            // CORS 정책 설정
-            services.AddCors();
+        public static IServiceCollection AddCustomSwagger(this IServiceCollection services, IConfiguration configuration)
+        {
+            //services.AddSwaggerGen(options =>
+            //{
+            //    //options.DescribeAllEnumsAsStrings();
+            //    options.SwaggerDoc("v1", new OpenApiInfo
+            //    {
+            //        Title = "AWMS WebApi - HTTP API",
+            //        Version = "v1",
+            //        Description = "AllregoSoft WebManagement Service HTTP API"
+            //    });
+            //    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+            //    {
+            //        Type = SecuritySchemeType.OAuth2,
+            //        Flows = new OpenApiOAuthFlows()
+            //        {
+            //            Implicit = new OpenApiOAuthFlow()
+            //            {
+            //                AuthorizationUrl = new Uri($"{configuration.GetValue<string>("IdentityUrlExternal")}/connect/authorize"),
+            //                TokenUrl = new Uri($"{configuration.GetValue<string>("IdentityUrlExternal")}/connect/token"),
+            //                Scopes = new Dictionary<string, string>()
+            //                {
+            //                    { "awms.api", "Allregosoft WebManagement Service Web API" }
+            //                }
+            //            }
+            //        }
+            //    });
 
-            // ApplicationCore 서비스 및 인터페이스 IoC 등록
-            services.Scan(scan => scan
-                .FromCallingAssembly()
-                .FromApplicationDependencies(a => a.FullName.StartsWith("AllregoSoft.WebManagementSystem.ApplicationCore"))
-                .AddClasses(publicOnly: true)
-                .AsMatchingInterface((service, filter) =>
-                    filter.Where(implementation => implementation.Name.Equals($"I{service.Name}", StringComparison.OrdinalIgnoreCase)))
-                .WithScopedLifetime()
+            //    options.OperationFilter<AuthorizeCheckOperationFilter>();
+            //});
 
-                .FromApplicationDependencies(a => a.FullName.StartsWith("AllregoSoft.WebManagementSystem.Infrastructure"))
-                .AddClasses(publicOnly: true)
-                .AsMatchingInterface((service, filter) =>
-                    filter.Where(implementation => implementation.Name.Equals($"I{service.Name}", StringComparison.OrdinalIgnoreCase)))
-                .WithScopedLifetime()
-            );
-
-            services.AddScoped<Infrastructure.Module.SignInManager>();
-            
-
-            services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                    //options.SerializerSettings.MaxDepth = 2;
-                });
-
-            // configure strongly typed settings objects
-            var appSettingsSection = Configuration.GetSection("AppSettings");
-            services.Configure<AppSettings>(appSettingsSection);
 
             services.AddSwaggerGen(c =>
             {
@@ -138,47 +274,11 @@ namespace AllregoSoft.WebManagementSystem.WebApi
                     {securityScheme, new string[] { }}
                 });
 
-                // _OR_ enable the annotations on Controller classes [SwaggerTag], if no class comments present
-                c.EnableAnnotations();
+                c.OperationFilter<AuthorizeCheckOperationFilter>();
             });
-        }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<AppSettings> settings)
-        {
-            Log.Logger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .WriteTo.File(settings.Value.LogPath, rollingInterval: RollingInterval.Day)
-                .CreateLogger();
 
-            //if (env.IsDevelopment())
-            //{
-            //    app.UseExceptionHandler("/error-local-development");
-            //}
-            //else
-            //{
-            //    app.UseExceptionHandler("/error");
-            //}
-
-            app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AllregoSoft.WebManagementSystem.WebApi v1"));
-
-            //app.UseHttpsRedirection();
-
-            app.UseRouting();
-            
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.UseCors(x => x
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            return services;
         }
     }
 }

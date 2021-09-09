@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>AWMS</title>
+    <meta name="description" content="AllregoSoft WebManagement Servcie">
+    @*<meta http-equiv="X-UA-Compatible" content="IE=edge">*@
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-inline'; script-src-elem 'unsafe-inline'">
+    <!-- Call App Mode on ios devices -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Remove Tap Highlight on Windows Phone IE -->
+    <meta name="msapplication-tap-highlight" content="no">
+
+    <!-- base css -->
+    <link rel="stylesheet" media="screen, print" href="~/bootstrap/css/vendors.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="~/bootstrap/css/app.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="~/bootstrap/css/themes/cust-theme-3.css">
+    <link rel="stylesheet" media="screen, print" href="~/bootstrap/css/page-login-alt.css">
+    <!-- Place favicon.ico in the root directory -->
+    <link rel="apple-touch-icon" sizes="180x180" href="~/bootstrap/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/bootstrap/img/favicon/favicon-32x32.png">
+    <link rel="mask-icon" href="~/bootstrap/img/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    @RenderSection("css", false)
+</head>
+<!-- BEGIN Body -->
+<body>
+    @RenderBody()
+    <!-- BEGIN Page Footer -->
+    <div class="position-absolute pos-bottom pos-left pos-right p-3 text-center text-dark">
+        2021 © AWMS by&nbsp;<a href="https://allregosoft.com" class="text-dark opacity-40 fw-500" title="gotbootstrap.com" target="_blank">allregosoft.com</a>
+    </div>
+    <!-- END Page Footer -->
+    @RenderSection("Scripts", false)
+</body>
+</html>

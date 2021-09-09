@@ -1,0 +1,34 @@
+﻿@model AllregoSoft.WebManagementSystem.WebApi.Identity.Models.AccountViewModels.LoginViewModel
+
+@{ 
+    ViewData["Title"] = "Log in";
+
+    var requestQuery = ViewContext.HttpContext.Request.Query;
+
+    requestQuery.TryGetValue("ReturnUrl", out var returnUrl);
+
+    string partialView;
+
+    //if (returnUrl[0].Contains("client_id=js"))
+    //{
+    //    Layout = "_Layout-SPA";
+    //    partialView = "_LoginPartial-SPA.cshtml";
+    //}
+    //else
+    //{
+    //    Layout = "_LoginLayout";
+    //    partialView = "_LoginPartial-AWMS.cshtml";
+    //}
+
+    Layout = "_LoginLayout";
+    partialView = "_LoginPartial-AWMS.cshtml";
+}
+
+<partial name=@partialView model=@Model />
+
+@section Scripts {
+    @*@{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }*@
+}
+
+
+

@@ -35,9 +35,10 @@
                                     <th>Id</th>
                                     <th class="text-center">사이트</th>
                                     <th class="text-center">ApplicationPool</th>
-                                    @*<th class="text-center">상태</th>*@
+                                    <th class="text-center">상태</th>
                                     <th class="text-center">Host</th>
                                     <th class="text-center">Port</th>
+                                    <th class="text-center">비고</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -89,11 +90,6 @@
         </div>
     </div>
 </main>
-
-@*<div>
-        <input type="text" id="domain-name" placeholder="도메인명을 넣어주세요." />
-        <button type="button" onclick="fnSiteAdd()">사이트 생성</button>
-    </div>*@
 
 @section Scripts{
     <script src="~/bootstrap/js/datagrid/datatables/datatables.bundle.js"></script>
@@ -155,8 +151,10 @@
                             })
                                 .then(response => {
                                     if (response.ok) {
-                                        Swal.fire('생성 되었습니다.');
-                                        location.reload();
+                                        Swal.fire('생성 되었습니다.').then(() => {
+                                            location.reload();
+                                        });
+                                        
                                     }
                                 })
                                 .catch(error => console.error('Error:', error));
@@ -177,10 +175,6 @@
                     scrollCollapse: true,
                     fixedHeader: true,
                     select: 'single',
-                    //json 형식일경우
-                    //data: data,
-
-                    //ajax 일경우
                     ajax: {
                         url: data_url,
                         dataSrc: '',
@@ -202,7 +196,7 @@
                         { data: 'Id', type: "readonly", width: '0' }, //rowId 옵션으로 대체
                         { data: 'Name', type: "readonly", width: '130px' },
                         { data: 'ApplicationPoolName', type: "readonly", width: '130px' },
-                        /*{ data: 'Status', type: "readonly", width: '80px' },*/
+                        { data: 'State', type: "readonly", width: '80px' },
                         { data: 'Host', type: "readonly", width: '*' },
                         { data: 'Port', type: "readonly", width: '60px' }
                     ],
@@ -214,22 +208,23 @@
                             visible: false,
                             searchable: false
                         },
-                        //{
-                        //    targets: [1],
-                        //    render: function (data, type, row) {
-                        //        let html = `<a href="javascript:copyToClipboard('127.0.0.1 ${row.Name}');" class="text-info fw-500">${row.Name}</a>`;
-                        //        return html;
-                        //    }
-                        //},
-                        //{
-                        //    targets: [3],
-                        //    render: function (data, type, row) {
-                        //        let startButton = `<button type="button" onclick="StartSite('${row.Name}');" class="btn-info btn-sm mr-1">시작</button>`;
-                        //        let stopButton = `<button type="button" onclick="StopSite('${row.Name}');" class="btn-warning btn-sm mr-1">중지</button>`;
-                        //        let html = `<div style="display:flex; justify-content:center;">${!row.IsStart ? startButton : stopButton}</div>`;
-                        //        return html;
-                        //    }
-                        //}
+                        {
+                            targets: [1],
+                            render: function (data, type, row) {
+                                let html = `<a href="javascript:copyToClipboard('127.0.0.1 ${row.Name}');" class="text-info fw-500">${row.Name}</a>`;
+                                return html;
+                            }
+                        },
+                        {
+                            targets: [5],
+                            render: function (data, type, row) {
+                                let startButton = `<button type="button" onclick="StartSite('${row.Name}');" class="btn-info btn-sm mr-1">시작</button>`;
+                                let stopButton = `<button type="button" onclick="StopSite('${row.Name}');" class="btn-warning btn-sm mr-1">중지</button>`;
+                                let RemoveButton = `<button type="button" onclick="RemoveSite('${row.Name}');" class="btn-danger btn-sm mr-1">삭제</button>`;
+                                let html = `<div style="display:flex; justify-content:center;">${startButton} | ${stopButton} | ${RemoveButton}</div>`;
+                                return html;
+                            }
+                        }
                     ],
                     responsive: true,
                     altEditor: true,
@@ -272,26 +267,63 @@
                         },
                     ],
                 });
-
-            //$('#dt-best-product').on('dblclick', 'tr', function () {
-            //    location.href = "/Product/BestProductReg/" + $(this).attr('Id');
-            //})
         }
 
         function StartSite(domain) {
-            fetch()
+            let url = new URL('@SiteHelper.Config.ApiDomain/Admin/StartSite');
 
-            $.post('@SiteHelper.Config.ApiDomain/Rental/StartSite', { domain: domain }, function (result) {
-                alert(result.message);
-                location.reload();
-            });
+            const params = { 'domain': domain }
+
+            url.search = new URLSearchParams(params).toString();
+
+            fetch(url, {
+                method: 'GET',
+                headers: AWUtil.headers('json')
+            })
+                .then(response => {
+                    if (response.ok) {
+                        Swal.fire('시작 되었습니다.').then(() => { location.reload(); });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
 
         function StopSite(domain) {
-            $.post('@SiteHelper.Config.ApiDomain/Rental/StopSite', { domain: domain }, function (result) {
-                alert(result.message);
-                location.reload();
-            });
+            let url = new URL('@SiteHelper.Config.ApiDomain/Admin/StopSite');
+
+            const params = { 'domain': domain }
+
+            url.search = new URLSearchParams(params).toString();
+
+            fetch(url, {
+                method: 'GET',
+                headers: AWUtil.headers('json')
+            })
+                .then(response => {
+                    if (response.ok) {
+                        Swal.fire('중지 되었습니다.').then(() => { location.reload(); });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function RemoveSite(domain) {
+            let url = new URL('@SiteHelper.Config.ApiDomain/Admin/RemoveSite');
+
+            const params = { 'domain': domain }
+
+            url.search = new URLSearchParams(params).toString();
+
+            fetch(url, {
+                method: 'GET',
+                headers: AWUtil.headers('json')
+            })
+                .then(response => {
+                    if (response.ok) {
+                        Swal.fire('삭제 되었습니다.').then(() => { location.reload(); });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
 
         function copyToClipboard(val) {
@@ -303,24 +335,5 @@
             document.body.removeChild(t);
             alert('복사 되었습니다.');
         }
-
-        @*function fnSiteAdd() {
-
-            let domain = $('#domain-name').val();
-            let url = new URL('@SiteHelper.Config.ApiDomain/Admin/AddSite');
-
-            const params = { 'domain': domain }
-
-            url.search = new URLSearchParams(params).toString();
-
-            fetch(url, {
-                method: 'GET',
-                headers: AWUtil.headers('json')
-            })
-                .then(response => {
-                    console.log(response.status);
-                })
-                .catch(error => console.error('Error:', error));
-    }*@
     </script>
 }

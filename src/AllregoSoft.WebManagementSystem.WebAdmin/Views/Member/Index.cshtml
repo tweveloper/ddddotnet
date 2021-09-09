@@ -1,0 +1,149 @@
+﻿@{
+    ViewData["Title"] = "회원목록";
+}
+
+@section css{
+    <link rel="stylesheet" media="screen, print" href="~/bootstrap/css/datagrid/datatables/datatables.bundle.css">
+    <style>
+        div.dataTables_info {
+            text-align: center;
+        }
+    </style>
+}
+
+@section scripts{
+    <script type="text/javascript" src="~/bootstrap/js/datagrid/datatables/datatables.bundle.js"></script>
+    <script>
+    $(document).ready(function () {
+        @*$('#grid_member').DataTable({
+            destroy: true,
+            fixedHeader: true,
+            responsive: true,
+            rowId: 'Id',
+            order: [[0, 'desc']],
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            select: 'single',
+            language: {
+                'emptyTable': '등록된 정보가 없습니다.'
+            },
+            ajax: {
+                url: '@Startup.appSettings["ApiDomain"]/Member/MemberList',
+                dataSrc: ''
+            },
+            columns: [
+                { data: 'Id', visible: false, searchable: false },
+                { data: 'Account', className: 'dt-center dt-body-left' },
+                { data: 'Name', className: 'dt-center' },
+                { data: 'HP', className: 'dt-center' },
+                { data: 'Email', className: 'dt-head-center dt-body-left' },
+                { data: 'RoleName', className: 'dt-center' },
+                { data: 'UseYN', className: 'dt-center' },
+                { data: 'RegDate', className: 'dt-center' }
+            ],
+            dom: "<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+                 "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-4'i><'col-sm-12 col-md-4'p>>",
+            buttons: [
+                @if (TempData["C"].ToString() == "Y")
+                {
+                    <text>
+                    {
+                        text: '<i class="fal fa-plus mr-1"></i> 추가',
+                        className: 'btn-success btn-sm mr-1',
+                        action: function (e, dt, node, config) {
+                            location.href = "/Member/MemberInfo/";
+                        }
+                },
+                    </text>
+                }
+                @if (TempData["U"].ToString() == "Y")
+                {
+                    <text>
+                    {
+                        extend: 'selected',
+                        text: '<i class="fal fa-edit mr-1"></i> 수정',
+                        name: 'edit',
+                        className: 'btn-primary btn-sm mr-1',
+                        action: function (e, dt, node, config) {
+                            var id = dt.rows({ selected: true }).data().pluck('Id').toArray().toString();
+                            location.href = '/Member/MemberInfo/' + id;
+                        }
+                    },
+                    </text>
+                }
+                @if (TempData["D"].ToString() == "Y")
+                {
+                    <text>
+                    {
+                        extend: 'selected',
+                        text: '<i class="fal fa-times mr-1"></i> 사용안함',
+                        className: 'btn-primary btn-sm mr-1',
+                        action: function (e, dt, node, config) {
+                            var ids = dt.rows({ selected: true }).data().pluck('Id').toArray().toString();
+                            var json = { 'Id': ids };
+                            var jsondata = JSON.stringify(json);
+
+                            fetch('@Startup.appSettings["ApiDomain"]/Member/Delete',
+                            {
+                                method: 'POST',
+                                body: jsondata,
+                                headers: AWUtil.headers('json')
+                            })
+                            .then(response => response.json())
+                            .then(function (data) {
+                                //console.log(data);
+                                    if (data.result == 'true') {
+                                        Swal.fire('저장에 성공했습니다.');
+                                        $('#grid_member').DataTable().ajax.reload();
+                                    } else {
+                                        Swal.fire('저장에 실패했습니다.');
+                                        console.log(data.message);
+                                    }
+                            })
+                            .catch(error => console.error('Error:', error));
+                        }
+                    }
+                    </text>
+                }
+            ]
+        });
+        @if (TempData["U"].ToString() == "Y")
+        {
+            <text>
+            $('#grid_member').on('dblclick', 'tr', function () {
+                location.href = '/Member/MemberInfo/' + $(this).attr('Id');
+            });
+            </text>
+        }*@
+    });
+    </script>
+}
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                <h2>
+                    <span>회원목록</span>
+                </h2>
+            </div>
+            <div class="col-xl-12 ml-auto mr-auto mb-3 mt-3">
+                <div class="card p-4 rounded-plus bg-faded">
+                    <table id="grid_member" class="table table-bordered table-hover table-striped w-100">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>계정</th>
+                                <th>이름</th>
+                                <th>핸드폰</th>
+                                <th>이메일</th>
+                                <th>역할</th>
+                                <th>사용여부</th>
+                                <th>등록일</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

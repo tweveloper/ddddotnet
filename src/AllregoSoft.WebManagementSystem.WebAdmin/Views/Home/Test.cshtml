@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Test";
+}
+
+<div>
+    <span>Token : </span> <span>@Model</span>
+    <button type="button" onclick="fnTest()">인증 테스트</button>
+</div>
+
+@section Scripts{ 
+    @*<script>
+    function fnTest() {
+        fetch('https://localhost:44306/api/Admin/GetSiteList',
+        {
+            method: 'Get',
+            headers: AWUtil.headers()
+        })
+        .then(response => response.json())
+            .then(function (data) {
+                console.log(data);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    </script>*@
+}

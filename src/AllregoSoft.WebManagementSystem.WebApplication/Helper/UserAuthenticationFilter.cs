@@ -1,13 +1,10 @@
-﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Entities;
-using AllregoSoft.WebManagementSystem.WebApplication.Controllers;
+﻿using AllregoSoft.WebManagementSystem.WebApplication.Controllers;
 using AllregoSoft.WebManagementSystem.WebApplication.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
-using System;
 using System.Linq;
-using System.Security.Claims;
 
 namespace AllregoSoft.WebManagementSystem.WebApplication.Filters
 {
