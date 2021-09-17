@@ -1,9 +1,11 @@
 ﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Aggregates.Members.Commands.CreateMember;
 using AllregoSoft.WebManagementSystem.ApplicationCore.Aggregates.Members.Queries;
+using AllregoSoft.WebManagementSystem.ApplicationCore.Aggregates.SiteMaps.Queries;
 using AllregoSoft.WebManagementSystem.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -12,12 +14,18 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
     [Authorize]
     public class MemberController : ApiControllerBase
     {
-        [HttpGet("{id}")]
-        public async Task<tbl_Member> GetMemberByIdAsync(long id)
+        [HttpGet("[action]")]
+        public async Task<tbl_Member> GetMemberByIdAsync(string identityId)
         {
             //var userName = IdentityService.GetUserName();
             //var identity = IdentityService.GetUserIdentity();
-            return await Mediator.Send(new GetMemberQuery { MemberId = id });
+            return await Mediator.Send(new GetMemberQuery { IdentityId = identityId });
+        }
+
+        [HttpGet("[action]")]
+        public async Task<List<tbl_SiteMap>> GetSiteMapAsync(long memberId)
+        {
+            return await Mediator.Send(new GetSiteMapQuery { MemberId = memberId });
         }
 
         //[HttpGet("{id}")]

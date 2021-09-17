@@ -4,12 +4,16 @@ namespace AllregoSoft.WebManagementSystem.Domain.Common
 {
     public abstract class AuditableEntity
     {
-        public DateTime Created { get; set; }
+        // 등록인id 
+        public long RegId { get; set; }
 
-        public string CreatedBy { get; set; }
+        // 등록일 
+        public DateTime RegDt { get; set; }
 
-        public DateTime? LastModified { get; set; }
+        // 수정인id 
+        public long? ModId { get; set; }
 
-        public string LastModifiedBy { get; set; }
+        // 수정일 
+        public DateTime? ModDt { get; set; }
     }
 }

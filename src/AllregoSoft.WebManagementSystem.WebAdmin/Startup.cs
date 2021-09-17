@@ -14,6 +14,11 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using Newtonsoft.Json.Serialization;
+using AllregoSoft.WebManagementSystem.WebAdmin.Infrastructure.Filters;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using IdentityModel;
+using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
 
 namespace AllregoSoft.WebManagementSystem.WebAdmin
 {
@@ -61,6 +66,14 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            var pathBase = Configuration["PATH_BASE"];
+
+            if (!string.IsNullOrEmpty(pathBase))
+            {
+                app.UsePathBase(pathBase);
+            }
+
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
@@ -135,6 +148,8 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin
                    .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
                    .AddHttpMessageHandler<HttpClientRequestIdDelegatingHandler>();
 
+            //services.AddScoped<SiteMapFilter>();
+            //services.AddScoped<InitFilter>();
             //services.AddHttpClient<ICatalogService, CatalogService>()
             //       .AddDevspacesSupport();
 
@@ -146,6 +161,7 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin
 
             //add custom application services
             services.AddTransient<IIdentityParser<ApplicationUser>, IdentityParser>();
+            services.AddTransient<IIdentityService, IdentityService>();
 
             return services;
         }
@@ -177,6 +193,24 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin
                 options.GetClaimsFromUserInfoEndpoint = true;
                 options.RequireHttpsMetadata = false;
                 options.Scope.Add("awms.api.full");
+                //options.CallbackPath = "/Security";
+                //options.Events = new OpenIdConnectEvents()
+                //{
+                //    OnRedirectToIdentityProvider = context =>
+                //    {
+                //        context.ProtocolMessage.Prompt = OidcConstants.PromptModes.None;
+                //        return Task.FromResult<object>(null);
+                //    },
+
+                //    OnMessageReceived = context => {
+                //        if (string.Equals(context.ProtocolMessage.Error, "login_required", StringComparison.Ordinal))
+                //        {
+                //            context.HandleResponse();
+                //            context.Response.Redirect("/");
+                //        }
+                //        return Task.FromResult<object>(null);
+                //    }
+                //};
             });
 
             return services;

@@ -12,7 +12,7 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Services
     {
         private readonly ILogger<DomainEventService> _logger;
         private readonly IPublisher _mediator;
-
+        
         public DomainEventService(ILogger<DomainEventService> logger, IPublisher mediator)
         {
             _logger = logger;

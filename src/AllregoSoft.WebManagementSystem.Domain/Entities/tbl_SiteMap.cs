@@ -1,13 +1,9 @@
 ﻿using AllregoSoft.WebManagementSystem.Domain.Common;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AllregoSoft.WebManagementSystem.Domain.Entities
 {
-    public  class tbl_SiteMap : AuditableEntity
+    public  class tbl_SiteMap : AuditableEntity, IHasDomainEvent
     {
         public long Id { get; set; }
         /// <summary>
@@ -17,7 +13,7 @@ namespace AllregoSoft.WebManagementSystem.Domain.Entities
         /// <summary>
         /// 상위고유번호
         /// </summary>
-        public long Parent { get; set; }
+        public long? Parent { get; set; }
         /// <summary>
         /// 차수
         /// </summary>
@@ -42,5 +38,6 @@ namespace AllregoSoft.WebManagementSystem.Domain.Entities
         /// 상태
         /// </summary>
         public string State { get; set; }
+        public List<DomainEvent> DomainEvents { get; set; } = new List<DomainEvent>();
     }
 }

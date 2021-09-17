@@ -2,6 +2,7 @@
 {
     public class AppSettings
     {
-        public string AdminClient { get; set; }
+        public string MvcClient { get; set; }
+        public string AWMSApiClient { get; set; }
     }
 }

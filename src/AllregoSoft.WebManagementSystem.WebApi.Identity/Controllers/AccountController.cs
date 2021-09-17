@@ -1,7 +1,6 @@
 ﻿using AllregoSoft.WebManagementSystem.WebApi.Identity.Models;
 using AllregoSoft.WebManagementSystem.WebApi.Identity.Models.AccountViewModels;
 using AllregoSoft.WebManagementSystem.WebApi.Identity.Services;
-using Microsoft.Extensions.Configuration;
 using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Models;
@@ -11,11 +10,12 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
@@ -28,13 +28,16 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
         private readonly ILogger<AccountController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        //private readonly IIdentityDbContext _context;
 
         public AccountController(ILoginService<ApplicationUser> loginService,
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             ILogger<AccountController> logger,
             UserManager<ApplicationUser> userManager,
-            IConfiguration configuration)
+            IConfiguration configuration
+            //IIdentityDbContext context
+            )
         {
             _loginService = loginService;
             _interaction = interaction;
@@ -42,6 +45,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
             _logger = logger;
             _userManager = userManager;
             _configuration = configuration;
+            //_context = context;
         }
 
         /// <summary>
@@ -61,6 +65,12 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
             ViewData["ReturnUrl"] = returnUrl;
 
             return View(vm);
+        }
+
+        public async Task<IActionResult> GetToken()
+        {
+            var token = await HttpContext.GetTokenAsync("access_token");
+            return View("Token",token);
         }
 
         /// <summary>
@@ -235,7 +245,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
+        public async Task<IActionResult> Register(RegisterViewModel model, CancellationToken cancellationToken, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
@@ -247,6 +257,16 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
                     Email = model.Email,
                 };
                 var result = await _userManager.CreateAsync(user, model.Password);
+
+                //_context.tbl_ScmMember.Add(new Domain.Entities.tbl_ScmMember
+                //{
+                //    Name = model.Email,
+                //    UseYn = "Y",
+                //    IdentityId = user.Id
+                //});
+
+                //await _context.SaveChangesAsync(cancellationToken);
+
                 if (result.Errors.Count() > 0)
                 {
                     AddErrors(result);

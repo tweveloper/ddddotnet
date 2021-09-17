@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AllregoSoft.WebManagementSystem.WebAdmin.ViewModels
 {
-    public class ApplicationUser : IdentityUser<Guid>
+    public class ApplicationUser : IdentityUser
     {
         [Required]
         public string Account { get; set; }

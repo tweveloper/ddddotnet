@@ -31,6 +31,8 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            //services.AddIdentityInfrastructure(Configuration);
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration["AWMS.Identity.ConnectionString"],
                 sqlServerOptionsAction: sqlOptions =>
@@ -40,7 +42,13 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity
                     sqlOptions.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
                 }));
 
-            services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 6;
+            })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -86,7 +94,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("admin", policy => policy.RequireRole("Administrator"));
+                options.AddPolicy("admin", policy => policy.RequireClaim("Administrator"));
             });
 
             services.AddControllers();
@@ -101,7 +109,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                //InitializeDbTestData(app, configuration); // TEST 데이터 삽입
+                InitializeDbTestData(app, configuration); // 기초데이터 삽입ㄴ
             }
             else
             {
@@ -120,7 +128,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity
             });
 
             // https://docs.microsoft.com/ko-kr/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-5.0
-                  // 프록시 서버 및 부하 분산 장치를 사용
+            // 프록시 서버 및 부하 분산 장치를 사용
             //app.UseForwardedHeaders();
 
             // Adds IdentityServer
@@ -132,6 +140,9 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity
             app.UseCookiePolicy(new CookiePolicyOptions { MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Lax });
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

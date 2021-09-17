@@ -1,11 +1,7 @@
 ﻿using AllregoSoft.WebManagementSystem.Domain.Entities;
+using AllregoSoft.WebManagementSystem.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AllregoSoft.WebManagementSystem.Infrastructure.Data.Configuration
 {
@@ -14,10 +10,22 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data.Configuration
         public void Configure(EntityTypeBuilder<tbl_Member> builder)
         {
             builder.ToTable("tbl_Member");
+            builder.HasKey(e => new { e.Id }).HasName("PK_tbl_Member");
 
-            builder.HasKey(e => e.Id);
-            builder.HasMany(e => e.Roles);
+            builder.Property(p => p.Id).HasComment("고유번호");
+
             builder.Ignore(e => e.DomainEvents);
+        }
+    }
+
+    class MemberLogConfiguration : IEntityTypeConfiguration<tbl_Member_Log>
+    {
+        public void Configure(EntityTypeBuilder<tbl_Member_Log> builder)
+        {
+            builder.ToTable("tbl_Member_Log");
+            builder.HasKey(e => new { e.Id }).HasName("PK_tbl_Member_Log");
+
+            builder.Property(p => p.Id).HasComment("고유번호");
         }
     }
 }

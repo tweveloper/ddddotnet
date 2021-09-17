@@ -26,7 +26,22 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure
             services.AddScoped<IApplicationDbContext>(provider => provider.GetService<AwmsDbContext>());
             services.AddScoped<IDomainEventService, DomainEventService>();
 
-            services.AddTransient<IDateTime, DateTimeService>();
+            return services;
+        }
+
+        public static IServiceCollection AddIdentityInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddDbContext<AwmsIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(configuration["AWMS.Application.ConnectionString"],
+                          sqlServerOptionsAction: sqlOptions =>
+                          {
+                              sqlOptions.MigrationsAssembly(typeof(AwmsIdentityDbContext).GetTypeInfo().Assembly.FullName);
+                              sqlOptions.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+                          });
+            }, ServiceLifetime.Scoped);
+
+            services.AddScoped<IIdentityDbContext>(provider => provider.GetService<AwmsIdentityDbContext>());
 
             return services;
         }

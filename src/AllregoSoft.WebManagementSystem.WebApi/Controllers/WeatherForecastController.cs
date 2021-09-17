@@ -11,17 +11,17 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
 {
     public class WeatherForecastController : ApiControllerBase
     {
-        private readonly ICurrentUserService _currentUserService;
+        //private readonly ICurrentUserService _currentUserService;
 
-        public WeatherForecastController(ICurrentUserService currentUserService)
-        {
-            _currentUserService = currentUserService;
-        }
+        //public WeatherForecastController(ICurrentUserService currentUserService)
+        //{
+        //    _currentUserService = currentUserService;
+        //}
         [Authorize]
         [HttpGet]
         public async Task<IEnumerable<WeatherForecast>> Get()
         {
-            var userId = _currentUserService.UserId;
+            //var userId = _currentUserService.UserId;
             //var token = await HttpContext.GetTokenAsync("access_token");
             return await Mediator.Send(new GetWeatherForecastsQuery());
         }

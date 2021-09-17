@@ -16,7 +16,8 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data.Configuration
         {
             builder.ToTable("tbl_Role");
 
-            builder.HasKey(e => e.Id);
+            builder.HasKey(e => new { e.Id }).HasName("PK_tbl_Role");
+            builder.Ignore(e => e.DomainEvents);
         }
     }
 }

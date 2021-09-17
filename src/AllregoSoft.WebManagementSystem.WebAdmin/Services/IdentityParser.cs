@@ -20,7 +20,7 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Services
                 {
                     Account = claims.Claims.FirstOrDefault(x => x.Type == "account")?.Value ?? "",
                     Email = claims.Claims.FirstOrDefault(x => x.Type == "email")?.Value ?? "",
-                    //Id = claims.Claims.FirstOrDefault(x => x.Type == "sub")?.Value,
+                    Id = claims.Claims.FirstOrDefault(x => x.Type == "sub")?.Value,
                     PhoneNumber = claims.Claims.FirstOrDefault(x => x.Type == "phone_number")?.Value ?? "",
                 };
             }

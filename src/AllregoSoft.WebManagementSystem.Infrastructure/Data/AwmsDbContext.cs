@@ -18,23 +18,21 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data
     public class AwmsDbContext : DbContext, IApplicationDbContext
     {
         private readonly ICurrentUserService _currentUserService;
-        private readonly IDateTime _dateTime;
         private readonly IDomainEventService _domainEventService;
-        public AwmsDbContext(DbContextOptions<AwmsDbContext> options) : base(options) { }
         public AwmsDbContext(
             DbContextOptions options, 
             ICurrentUserService currentUserService,
-            IDomainEventService domainEventService,
-            IDateTime dateTime) : base(options)
+            IDomainEventService domainEventService) : base(options)
         {
             _currentUserService = currentUserService;
             _domainEventService = domainEventService;
-            _dateTime = dateTime;
         }
 
+        public DbSet<tbl_ScmMember> tbl_ScmMember { get; set; }
         public DbSet<tbl_Member> tbl_Member { get; set; }
         public DbSet<tbl_Role> tbl_Role { get; set; }
         public DbSet<tbl_SiteMap> tbl_SiteMap { get; set; }
+        public DbSet<tbl_Role_Mapping> tbl_Role_Mapping { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
@@ -43,13 +41,13 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        entry.Entity.CreatedBy = _currentUserService.UserId;
-                        entry.Entity.Created = _dateTime.Now;
+                        entry.Entity.RegId = _currentUserService == null ? 0 : _currentUserService.UserId;
+                        entry.Entity.RegDt = DateTime.Now;
                         break;
 
                     case EntityState.Modified:
-                        entry.Entity.LastModifiedBy = _currentUserService.UserId;
-                        entry.Entity.LastModified = _dateTime.Now;
+                        entry.Entity.ModId = _currentUserService == null ? 0 : _currentUserService.UserId;
+                        entry.Entity.ModDt = DateTime.Now;
                         break;
                 }
             }
@@ -94,7 +92,7 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data
                         "data source=localhost;initial catalog=AWMS;persist security info=True;user id=sa;password=Pa$$w0rd",
                         b => b.MigrationsAssembly(typeof(AwmsDbContext).Assembly.FullName));
 
-            return new AwmsDbContext(optionsBuilder.Options);
+            return new AwmsDbContext(optionsBuilder.Options, null, null);
         }
     }
 }

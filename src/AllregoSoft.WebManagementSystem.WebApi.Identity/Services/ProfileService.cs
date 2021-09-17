@@ -31,6 +31,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Services
             if (user == null)
                 throw new ArgumentException("Invalid subject identifier");
 
+            var roles = _userManager.GetRolesAsync(user);
             var claims = GetClaimsFromUser(user);
             context.IssuedClaims = claims.ToList();
         }

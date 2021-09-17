@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using AllregoSoft.WebManagementSystem.Domain.Common;
+using System.Collections.Generic;
 
 namespace AllregoSoft.WebManagementSystem.Domain.Entities
 {
-    public class tbl_Role
+    public class tbl_Role : AuditableEntity, IHasDomainEvent
     {
-        public long Id { get; set; }
+        public int Id { get; set; }
         /// <summary>
         /// 명칭
         /// </summary>
@@ -14,11 +14,6 @@ namespace AllregoSoft.WebManagementSystem.Domain.Entities
         /// 상태
         /// </summary>
         public string State { get; set; }
-
-        //[InverseProperty("Role")]
-        //public virtual ICollection<tbl_Role_Mapping> RoleMapping { get; set; }
-
-        //[InverseProperty("Role")]
-        //public virtual ICollection<tbl_Member> Member { get; set; }
+        public List<DomainEvent> DomainEvents { get; set; } = new List<DomainEvent>();
     }
 }

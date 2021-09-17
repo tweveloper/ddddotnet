@@ -9,7 +9,6 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Models
         {
             DomainEvent = domainEvent;
         }
-
         public TDomainEvent DomainEvent { get; }
     }
 }

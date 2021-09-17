@@ -11,8 +11,9 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Services
     public interface IMemberService
     {
         Task<tbl_Member> GetMember(long id);
-        Task<tbl_Member> GetMember(Guid id);
-        Task<Guid> CreateAuthentication(RegisterViewModel model);
+        Task<tbl_Member> GetMemberByIdentity(string id);
+        Task<string> CreateAuthentication(RegisterViewModel model);
         Task CreateMember(CreateMemberCommand command);
+        Task<List<tbl_SiteMap>> GetSiteMap(long memberId, IEnumerable<long> roleIds);
     }
 }

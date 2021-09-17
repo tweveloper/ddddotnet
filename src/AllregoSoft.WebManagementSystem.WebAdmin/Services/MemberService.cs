@@ -28,7 +28,7 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Services
             _httpClient = httpClient;
             _logger = logger;
 
-            _apiBaseUrl = $"{_settings.Value.ApiUrl}/api/v1/member/";
+            _apiBaseUrl = $"{_settings.Value.ApiUrl}/api/v1/member";
         }
         public async Task<tbl_Member> GetMember(long id)
         {
@@ -43,11 +43,11 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Services
                 JsonConvert.DeserializeObject<tbl_Member>(responseString);
         }
 
-        public async Task<tbl_Member> GetMember(Guid id)
+        public async Task<tbl_Member> GetMemberByIdentity(string id)
         {
-            var uri = API.Member.GetMember(_apiBaseUrl, id);
+            var uri = API.Member.GetMemberByIdentity(_apiBaseUrl, id);
             _logger.LogDebug("[GetMember] -> Calling {Uri} to get the member", uri);
-            var response = await _httpClient.GetAsync(uri);
+            var response = await _httpClient.GetAsync($"{_apiBaseUrl}/GetMemberById?identityId={id}");
             _logger.LogDebug("[GetMember] -> response code {StatusCode}", response.StatusCode);
             var responseString = await response.Content.ReadAsStringAsync();
 
@@ -56,7 +56,7 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Services
                 JsonConvert.DeserializeObject<tbl_Member>(responseString);
         }
 
-        public async Task<Guid> CreateAuthentication(RegisterViewModel model)
+        public async Task<string> CreateAuthentication(RegisterViewModel model)
         {
             var uri = API.Member.CreateAuthentication(_settings.Value.IdentityUrl);
             _logger.LogDebug("[RegisterUser] -> Calling {Uri} to get the member", uri);
@@ -81,6 +81,21 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Services
 
             var response = await _httpClient.PostAsync(uri, data);
 
+        }
+
+        public async Task<List<tbl_SiteMap>> GetSiteMap(long memberId, IEnumerable<long> roleIds)
+        {
+            var uri = API.Member.GetSiteMap(_apiBaseUrl);
+            _logger.LogDebug("[GetSiteMap] -> Calling {Uri} to get the member", uri);
+            var response = await _httpClient.GetAsync(uri);
+            _logger.LogDebug("[GetSiteMap] -> response code {StatusCode}", response.StatusCode);
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            return string.IsNullOrEmpty(responseString) ?
+                null :
+                JsonConvert.DeserializeObject<List<tbl_SiteMap>>(responseString);
+
+            throw new NotImplementedException();
         }
     }
 }

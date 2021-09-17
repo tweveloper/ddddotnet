@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
 {
+    [Authorize("Admin")]
     [Produces("application/json")]
     [Route("api/auth")]
     public class AuthController : Controller
@@ -30,9 +31,10 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
         }
 
         [HttpGet("[action]")]
-        public IActionResult Get()
+        public IActionResult Get(string account)
         {
-            return Ok();
+            var userId = _userManager.FindByIdAsync(account);
+            return Ok(userId);
         }
 
         //
