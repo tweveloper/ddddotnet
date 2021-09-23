@@ -16,12 +16,12 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data.Configuration
         }
     }
 
-    class BrandLogConfiguration : IEntityTypeConfiguration<tbl_Brand_Log>
-    {
-        public void Configure(EntityTypeBuilder<tbl_Brand_Log> builder)
-        {
-            builder.ToTable("tbl_Brand_Log");
-            builder.HasKey(e => new { e.Id }).HasName("PK_tbl_Brand_Log");
-        }
-    }
+    //class BrandLogConfiguration : IEntityTypeConfiguration<tbl_Brand_Log>
+    //{
+    //    public void Configure(EntityTypeBuilder<tbl_Brand_Log> builder)
+    //    {
+    //        builder.ToTable("tbl_Brand_Log");
+    //        builder.HasKey(e => new { e.Id }).HasName("PK_tbl_Brand_Log");
+    //    }
+    //}
 }

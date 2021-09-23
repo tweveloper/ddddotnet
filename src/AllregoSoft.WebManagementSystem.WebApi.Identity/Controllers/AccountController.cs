@@ -28,7 +28,6 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
         private readonly ILogger<AccountController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
-        //private readonly IIdentityDbContext _context;
 
         public AccountController(ILoginService<ApplicationUser> loginService,
             IIdentityServerInteractionService interaction,
@@ -36,7 +35,6 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
             ILogger<AccountController> logger,
             UserManager<ApplicationUser> userManager,
             IConfiguration configuration
-            //IIdentityDbContext context
             )
         {
             _loginService = loginService;
@@ -45,7 +43,6 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
             _logger = logger;
             _userManager = userManager;
             _configuration = configuration;
-            //_context = context;
         }
 
         /// <summary>
@@ -82,7 +79,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _loginService.FindByUsername(model.Email);
+                var user = await _loginService.FindByUsername(model.Account);
 
                 if (await _loginService.ValidateCredentials(user, model.Password))
                 {
@@ -140,7 +137,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
             return new LoginViewModel
             {
                 ReturnUrl = returnUrl,
-                Email = context?.LoginHint,
+                Account = context?.LoginHint,
             };
         }
 
@@ -148,7 +145,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
         {
             var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
             var vm = await BuildLoginViewModelAsync(model.ReturnUrl, context);
-            vm.Email = model.Email;
+            vm.Account = model.Account;
             vm.RememberMe = model.RememberMe;
             return vm;
         }

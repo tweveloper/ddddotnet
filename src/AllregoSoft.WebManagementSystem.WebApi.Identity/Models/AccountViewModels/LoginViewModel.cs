@@ -5,8 +5,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Models.AccountViewMode
     public record LoginViewModel
     {
         [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        public string Account { get; set; }
 
         [Required]
         [DataType(DataType.Password)]

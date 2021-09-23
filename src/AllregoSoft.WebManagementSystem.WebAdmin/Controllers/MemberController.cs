@@ -1,14 +1,10 @@
-﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Aggregates.Members.Commands.CreateMember;
-using AllregoSoft.WebManagementSystem.WebAdmin.Services;
+﻿using AllregoSoft.WebManagementSystem.WebAdmin.Services;
 using AllregoSoft.WebManagementSystem.WebAdmin.ViewModels;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using System.Linq;
-using Microsoft.AspNetCore.Http;
 
 namespace AllregoSoft.WebManagementSystem.WebAdmin.Controllers
 {

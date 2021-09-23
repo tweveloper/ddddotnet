@@ -11,16 +11,16 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Behaviours
     {
         private readonly Stopwatch _timer;
         private readonly ILogger<TRequest> _logger;
-        private readonly ICurrentUserService _currentUserService;
+        private readonly IIdentityService _identityService;
 
         public PerformanceBehaviour(
-            ILogger<TRequest> logger, 
-            ICurrentUserService currentUserService)
+            ILogger<TRequest> logger,
+            IIdentityService identityService)
         {
             _timer = new Stopwatch();
 
             _logger = logger;
-            _currentUserService = currentUserService;
+            _identityService = identityService;
         }
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
@@ -36,7 +36,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Behaviours
             if (elapsedMilliseconds > 500)
             {
                 var requestName = typeof(TRequest).Name;
-                var userId = _currentUserService.UserId;
+                var userId = _identityService.GetUserId();
 
                 _logger.LogWarning("AWMS Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@UserId} {@Request}",
                     requestName, elapsedMilliseconds, userId, request);

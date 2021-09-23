@@ -1,12 +1,9 @@
 ﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Claims;
 
-namespace AllregoSoft.WebManagementSystem.WebApi.Services
+namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
 {
     public class IdentityService : IIdentityService
     {
@@ -15,6 +12,12 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Services
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
+
+        public long GetUserId()
+        {
+            return long.Parse(_context.HttpContext.User.FindFirst("mem")?.Value ?? "0");
+        }
+
         public string GetUserIdentity()
         {
             return _context.HttpContext.User.FindFirst("sub").Value;
@@ -23,6 +26,11 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Services
         public string GetUserName()
         {
             return _context.HttpContext.User.Identity.Name;
+        }
+
+        public ClaimsPrincipal GetClaimsPrincipal()
+        {
+            return _context.HttpContext.User;
         }
     }
 }

@@ -18,14 +18,14 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data.Configuration
         }
     }
 
-    class MemberLogConfiguration : IEntityTypeConfiguration<tbl_Member_Log>
-    {
-        public void Configure(EntityTypeBuilder<tbl_Member_Log> builder)
-        {
-            builder.ToTable("tbl_Member_Log");
-            builder.HasKey(e => new { e.Id }).HasName("PK_tbl_Member_Log");
+    //class MemberLogConfiguration : IEntityTypeConfiguration<tbl_Member_Log>
+    //{
+    //    public void Configure(EntityTypeBuilder<tbl_Member_Log> builder)
+    //    {
+    //        builder.ToTable("tbl_Member_Log");
+    //        builder.HasKey(e => new { e.Id }).HasName("PK_tbl_Member_Log");
 
-            builder.Property(p => p.Id).HasComment("고유번호");
-        }
-    }
+    //        builder.Property(p => p.Id).HasComment("고유번호");
+    //    }
+    //}
 }

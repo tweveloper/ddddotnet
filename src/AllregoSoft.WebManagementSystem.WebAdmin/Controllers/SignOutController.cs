@@ -14,7 +14,7 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
     }
 }

@@ -5,8 +5,10 @@ using MediatR;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -17,16 +19,20 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data
 {
     public class AwmsDbContext : DbContext, IApplicationDbContext
     {
-        private readonly ICurrentUserService _currentUserService;
+        private readonly IIdentityService _identityService;
         private readonly IDomainEventService _domainEventService;
+        
+        private IDbContextTransaction _currentTransaction;
         public AwmsDbContext(
-            DbContextOptions options, 
-            ICurrentUserService currentUserService,
+            DbContextOptions options,
+            IIdentityService identityService,
             IDomainEventService domainEventService) : base(options)
         {
-            _currentUserService = currentUserService;
+            _identityService = identityService;
             _domainEventService = domainEventService;
         }
+
+        public IDbContextTransaction GetCurrentTransaction() => _currentTransaction;
 
         public DbSet<tbl_ScmMember> tbl_ScmMember { get; set; }
         public DbSet<tbl_Member> tbl_Member { get; set; }
@@ -41,12 +47,12 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        entry.Entity.RegId = _currentUserService == null ? 0 : _currentUserService.UserId;
+                        entry.Entity.RegId = _identityService == null ? 0 : _identityService.GetUserId();
                         entry.Entity.RegDt = DateTime.Now;
                         break;
 
                     case EntityState.Modified:
-                        entry.Entity.ModId = _currentUserService == null ? 0 : _currentUserService.UserId;
+                        entry.Entity.ModId = _identityService == null ? 0 : _identityService.GetUserId();
                         entry.Entity.ModDt = DateTime.Now;
                         break;
                 }
@@ -57,6 +63,56 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data
             await DispatchEvents();
 
             return result;
+        }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            if (_currentTransaction != null) return null;
+
+            _currentTransaction = await Database.BeginTransactionAsync(IsolationLevel.ReadUncommitted);
+
+            return _currentTransaction;
+        }
+
+        public async Task CommitTransactionAsync(IDbContextTransaction transaction)
+        {
+            if (transaction == null) throw new ArgumentNullException(nameof(transaction));
+            if (transaction != _currentTransaction) throw new InvalidOperationException($"Transaction {transaction.TransactionId} is not current");
+
+            try
+            {
+                await SaveChangesAsync();
+                transaction.Commit();
+            }
+            catch
+            {
+                RollbackTransaction();
+                throw;
+            }
+            finally
+            {
+                if (_currentTransaction != null)
+                {
+                    _currentTransaction.Dispose();
+                    _currentTransaction = null;
+                }
+            }
+        }
+
+        public void RollbackTransaction()
+        {
+            try
+            {
+                _currentTransaction?.Rollback();
+            }
+            finally
+            {
+                if (_currentTransaction != null)
+                {
+                    _currentTransaction.Dispose();
+                    _currentTransaction = null;
+                }
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

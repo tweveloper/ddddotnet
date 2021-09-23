@@ -11,17 +11,17 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Behaviours
     public class LoggingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
         private readonly ILogger _logger;
-        private readonly ICurrentUserService _currentUserService;
+        private readonly IIdentityService _identityService;
 
-        public LoggingBehaviour(ILogger<TRequest> logger, ICurrentUserService currentUserService)
+        public LoggingBehaviour(ILogger<TRequest> logger, IIdentityService identityService)
         {
             _logger = logger;
-            _currentUserService = currentUserService;
+            _identityService = identityService;
         }
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
-            var userId = _currentUserService.UserId;
+            var userId = _identityService.GetUserId();
 
             _logger.LogInformation("----- Handling command {CommandName} {@UserId} ({@Command})", request.GetGenericTypeName(), userId, request);
             var response = await next();

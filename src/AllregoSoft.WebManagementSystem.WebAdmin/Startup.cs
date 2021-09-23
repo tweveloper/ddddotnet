@@ -1,6 +1,10 @@
+using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
+using AllregoSoft.WebManagementSystem.ApplicationCore.Services;
 using AllregoSoft.WebManagementSystem.WebAdmin.Infrastructure;
+using AllregoSoft.WebManagementSystem.WebAdmin.Infrastructure.Helper;
 using AllregoSoft.WebManagementSystem.WebAdmin.Services;
 using AllregoSoft.WebManagementSystem.WebAdmin.ViewModels;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -10,15 +14,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
-using Newtonsoft.Json.Serialization;
-using AllregoSoft.WebManagementSystem.WebAdmin.Infrastructure.Filters;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using IdentityModel;
-using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
 
 namespace AllregoSoft.WebManagementSystem.WebAdmin
 {
@@ -39,7 +38,7 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin
                 .AddCustomMvc(Configuration)
                 .AddHttpClientServices(Configuration);
 
-                   // PII(Personally Identifiable Information :  개인정보)가 로그에 표시되는지 여부를 나타내는 플래그입니다. 기본적으로 거짓입니다.
+            // PII(Personally Identifiable Information :  개인정보)가 로그에 표시되는지 여부를 나타내는 플래그입니다. 기본적으로 거짓입니다.
             IdentityModelEventSource.ShowPII = true;       // Caution! Do NOT use in production: https://aka.ms/IdentityModel/PII
 
             services.AddControllers()
@@ -56,6 +55,7 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub");
+            SiteHelper.Services = app.ApplicationServices;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -65,13 +65,6 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-            }
-
-            var pathBase = Configuration["PATH_BASE"];
-
-            if (!string.IsNullOrEmpty(pathBase))
-            {
-                app.UsePathBase(pathBase);
             }
 
             app.UseHttpsRedirection();
@@ -124,8 +117,16 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin
             services.AddRazorPages().AddSessionStateTempDataProvider().AddRazorRuntimeCompilation();
             services.AddOptions();
             services.Configure<AppSettings>(configuration);
-            services.AddSession();
-            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.Cookie.Name = ".AWMS.Session";
+                //options.IdleTimeout = TimeSpan.FromSeconds(10); // 기본값 20분
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
+            // ASP.NET Core 분산 캐싱 - https://docs.microsoft.com/ko-kr/aspnet/core/performance/caching/distributed?view=aspnetcore-5.0
+            //services.AddDistributedMemoryCache(); 
 
             return services;
         }
@@ -144,6 +145,11 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin
 
             //add http client services
             services.AddHttpClient<IMemberService, MemberService>()
+                   //.SetHandlerLifetime(TimeSpan.FromMinutes(5))  //Sample. Default lifetime is 2 minutes
+                   .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
+                   .AddHttpMessageHandler<HttpClientRequestIdDelegatingHandler>();
+
+            services.AddHttpClient<IScmMemberService, ScmMemberService>()
                    //.SetHandlerLifetime(TimeSpan.FromMinutes(5))  //Sample. Default lifetime is 2 minutes
                    .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
                    .AddHttpMessageHandler<HttpClientRequestIdDelegatingHandler>();
@@ -193,24 +199,15 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin
                 options.GetClaimsFromUserInfoEndpoint = true;
                 options.RequireHttpsMetadata = false;
                 options.Scope.Add("awms.api.full");
-                //options.CallbackPath = "/Security";
-                //options.Events = new OpenIdConnectEvents()
-                //{
-                //    OnRedirectToIdentityProvider = context =>
-                //    {
-                //        context.ProtocolMessage.Prompt = OidcConstants.PromptModes.None;
-                //        return Task.FromResult<object>(null);
-                //    },
 
-                //    OnMessageReceived = context => {
-                //        if (string.Equals(context.ProtocolMessage.Error, "login_required", StringComparison.Ordinal))
-                //        {
-                //            context.HandleResponse();
-                //            context.Response.Redirect("/");
-                //        }
-                //        return Task.FromResult<object>(null);
-                //    }
-                //};
+                // ASP.NET Core에서 클레임 매핑, 사용자 지정 및 변환 - https://docs.microsoft.com/ko-kr/aspnet/core/security/authentication/claims?view=aspnetcore-5.0
+                options.ClaimActions.MapUniqueJsonKey("account", "account");
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    NameClaimType = "account",
+                    RoleClaimType = "role"
+                };
             });
 
             return services;

@@ -18,7 +18,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Data
 
             //var adminClaim = new Claim("Role", "Admin");
 
-            var administrator = new ApplicationUser { Account = "admin", UserName = "admin@localhost", Email = "admin@localhost" };
+            var administrator = new ApplicationUser { Account = "admin", UserName = "admin", Email = "admin@localhost" };
 
             if (userManager.Users.All(u => u.UserName != administrator.UserName))
             {

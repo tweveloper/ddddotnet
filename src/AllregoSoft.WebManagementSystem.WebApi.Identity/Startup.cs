@@ -1,5 +1,6 @@
 using AllregoSoft.WebManagementSystem.WebApi.Identity.Configuration;
 using AllregoSoft.WebManagementSystem.WebApi.Identity.Data;
+using AllregoSoft.WebManagementSystem.WebApi.Identity.Interfaces;
 using AllregoSoft.WebManagementSystem.WebApi.Identity.Models;
 using AllregoSoft.WebManagementSystem.WebApi.Identity.Services;
 using IdentityServer4.EntityFramework.DbContexts;
@@ -90,7 +91,9 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity
                         sqlOptions.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
                     });
             })
-            .Services.AddTransient<IProfileService, ProfileService>();
+            .AddProfileService<ProfileService>();
+            
+            services.AddTransient<IIdentityServerService, IdentityServerService>();
 
             services.AddAuthorization(options =>
             {

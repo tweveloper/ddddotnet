@@ -23,17 +23,17 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data.Configuration
         }
     }
 
-    class ScmMemberLogConfiguration : IEntityTypeConfiguration<tbl_ScmMember_Log>
-    {
-        public void Configure(EntityTypeBuilder<tbl_ScmMember_Log> builder)
-        {
-            builder.ToTable("tbl_ScmMember_Log");
-            builder.HasKey(e => new { e.Id }).HasName("PK_tbl_ScmMember_Log");
+    //class ScmMemberLogConfiguration : IEntityTypeConfiguration<tbl_ScmMember_Log>
+    //{
+    //    public void Configure(EntityTypeBuilder<tbl_ScmMember_Log> builder)
+    //    {
+    //        builder.ToTable("tbl_ScmMember_Log");
+    //        builder.HasKey(e => new { e.Id }).HasName("PK_tbl_ScmMember_Log");
 
-            builder.Property(p => p.Id).HasComment("고유번호");
+    //        builder.Property(p => p.Id).HasComment("고유번호");
             
-        }
-    }
+    //    }
+    //}
 
     class ScmMemberDeliveryConfiguration : IEntityTypeConfiguration<tbl_ScmMember_Delivery>
     {

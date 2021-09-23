@@ -18,14 +18,14 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data.Configuration
         }
     }
 
-    class InfluencerLogConfiguration : IEntityTypeConfiguration<tbl_Influencer_Master_Log>
-    {
-        public void Configure(EntityTypeBuilder<tbl_Influencer_Master_Log> builder)
-        {
-            builder.ToTable("tbl_Influencer_Master_Log");
-            builder.HasKey(e => new { e.Id }).HasName("PK_tbl_Influencer_Master_Log");
+    //class InfluencerLogConfiguration : IEntityTypeConfiguration<tbl_Influencer_Master_Log>
+    //{
+    //    public void Configure(EntityTypeBuilder<tbl_Influencer_Master_Log> builder)
+    //    {
+    //        builder.ToTable("tbl_Influencer_Master_Log");
+    //        builder.HasKey(e => new { e.Id }).HasName("PK_tbl_Influencer_Master_Log");
 
-            builder.Property(p => p.Id).HasComment("고유번호");
-        }
-    }
+    //        builder.Property(p => p.Id).HasComment("고유번호");
+    //    }
+    //}
 }

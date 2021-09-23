@@ -17,8 +17,6 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
         [HttpGet("[action]")]
         public async Task<tbl_Member> GetMemberByIdAsync(string identityId)
         {
-            //var userName = IdentityService.GetUserName();
-            //var identity = IdentityService.GetUserIdentity();
             return await Mediator.Send(new GetMemberQuery { IdentityId = identityId });
         }
 

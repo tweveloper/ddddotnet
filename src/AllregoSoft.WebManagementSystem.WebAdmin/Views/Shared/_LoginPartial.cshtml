@@ -5,12 +5,12 @@
 @inject IIdentityParser<ApplicationUser> UserManager
 
 <div>
-    @if (User.FindFirst(x => x.Type == "email") != null)
+    @if (User.FindFirst(x => x.Type == "account") != null)
     {
         <form asp-area="" asp-controller="Account" asp-action="SignOut" method="post" id="logoutForm" class="navbar-right">
             <a href="#" data-toggle="dropdown" class="header-icon d-flex align-items-center justify-content-center ml-2">
                 <img src="~/bootstrap/img/logo.png" class="profile-image rounded-circle">
-                <span class="ml-1 mr-1 text-truncate text-truncate-header hidden-xs-down">@User.FindFirst(x => x.Type == "email").Value</span>
+                <span class="ml-1 mr-1 text-truncate text-truncate-header hidden-xs-down">@User.FindFirst(x => x.Type == "account").Value</span>
                 <i class="ni ni-chevron-down hidden-xs-down"></i>
             </a>
             <div class="dropdown-menu dropdown-menu-animated dropdown-lg">

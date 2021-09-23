@@ -1,9 +1,9 @@
 using AllregoSoft.WebManagementSystem.ApplicationCore;
 using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
+using AllregoSoft.WebManagementSystem.ApplicationCore.Services;
 using AllregoSoft.WebManagementSystem.Infrastructure;
 using AllregoSoft.WebManagementSystem.WebApi.Filters;
 using AllregoSoft.WebManagementSystem.WebApi.Module;
-using AllregoSoft.WebManagementSystem.WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,8 +15,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
@@ -37,66 +35,66 @@ namespace AllregoSoft.WebManagementSystem.WebApi
         {
             services.AddApplicationCore();
             services.AddInfrastructure(Configuration);
-            //services.AddCustomSwagger(Configuration);
-            //services.AddCustomMvc();
-            //services.AddCustomIntegrations(Configuration);
-            //services.AddCustomConfiguration(Configuration);
-            //services.AddCustomAuthentication(Configuration);
+            services.AddCustomSwagger(Configuration);
+            services.AddCustomMvc();
+            services.AddCustomIntegrations(Configuration);
+            services.AddCustomConfiguration(Configuration);
+            services.AddCustomAuthentication(Configuration);
 
             //services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddSingleton<ICurrentUserService, CurrentUserService>();
+            //services.AddSingleton<IIdentityService, IdentityService>();
 
-            services.AddHttpContextAccessor();
+            //services.AddHttpContextAccessor();
 
-            services.Configure<WebEncoderOptions>(options =>
-            {
-                options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All); // 한글이 인코딩되는 문제 해결
-            });
+            //services.Configure<WebEncoderOptions>(options =>
+            //{
+            //    options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All); // 한글이 인코딩되는 문제 해결
+            //});
 
 
-            services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                    //options.SerializerSettings.MaxDepth = 2;
-                });
+            //services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))
+            //    .AddNewtonsoftJson(options =>
+            //    {
+            //        options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            //        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            //        //options.SerializerSettings.MaxDepth = 2;
+            //    });
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "AllregoSoft.WebManagementSystem.WebApi", Version = "v1" });
+            //services.AddSwaggerGen(c =>
+            //{
+            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "AllregoSoft.WebManagementSystem.WebApi", Version = "v1" });
 
-                var securityScheme = new OpenApiSecurityScheme
-                {
-                    Name = "JWT Authentication",
-                    Description = "Enter JWT Bearer token **_only_**",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "bearer", // must be lower case
-                    BearerFormat = "JWT",
-                    Reference = new OpenApiReference
-                    {
-                        Id = JwtBearerDefaults.AuthenticationScheme,
-                        Type = ReferenceType.SecurityScheme
-                    }
-                };
-                c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {securityScheme, new string[] { }}
-                });
+            //    var securityScheme = new OpenApiSecurityScheme
+            //    {
+            //        Name = "JWT Authentication",
+            //        Description = "Enter JWT Bearer token **_only_**",
+            //        In = ParameterLocation.Header,
+            //        Type = SecuritySchemeType.Http,
+            //        Scheme = "bearer", // must be lower case
+            //        BearerFormat = "JWT",
+            //        Reference = new OpenApiReference
+            //        {
+            //            Id = JwtBearerDefaults.AuthenticationScheme,
+            //            Type = ReferenceType.SecurityScheme
+            //        }
+            //    };
+            //    c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+            //    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            //    {
+            //        {securityScheme, new string[] { }}
+            //    });
 
-                // _OR_ enable the annotations on Controller classes [SwaggerTag], if no class comments present
-                c.EnableAnnotations();
-            });
+            //    // _OR_ enable the annotations on Controller classes [SwaggerTag], if no class comments present
+            //    c.EnableAnnotations();
+            //});
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddIdentityServerAuthentication(options =>
-                {
-                    options.ApiName = "awms.api";
-                    options.Authority = "https://localhost:44390";
-                });
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //    .AddIdentityServerAuthentication(options =>
+            //    {
+            //        options.ApiName = "awms.api";
+            //        options.Authority = "https://localhost:44390";
+            //    });
 
         }
 

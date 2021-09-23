@@ -11,15 +11,15 @@
     <div class="card p-4 border-top-left-radius-0 border-top-right-radius-0">
         <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
             <div class="form-group">
-                <label class="form-label" for="username">Email</label>
-                <input type="email" id="Email" name="Email" class="form-control" placeholder="your id or email">
+                <label class="form-label" for="username">Account</label>
+                <input type="text" id="Account" name="Account" class="form-control" placeholder="아이디를 입력해 주세요.">
                 <span class="help-block">
-                    Your unique email to app
+                    Your unique account to app
                 </span>
             </div>
             <div class="form-group">
                 <label class="form-label" for="Password">Password</label>
-                <input type="password" id="Password" name="Password" class="form-control" placeholder="password">
+                <input type="password" id="Password" name="Password" class="form-control" placeholder="비밀번호를 입력해 주세요.">
                 <span class="help-block">
                     Your password
                 </span>

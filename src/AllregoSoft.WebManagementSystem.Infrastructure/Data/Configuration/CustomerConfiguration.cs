@@ -23,17 +23,17 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data.Configuration
         }
     }
 
-    class CustomerLogConfiguration : IEntityTypeConfiguration<tbl_Customer_Log>
-    {
-        public void Configure(EntityTypeBuilder<tbl_Customer_Log> builder)
-        {
-            builder.ToTable("tbl_Customer_Log");
-            builder.HasKey(e => new { e.Id }).HasName("PK_tbl_Customer_Log");
+    //class CustomerLogConfiguration : IEntityTypeConfiguration<tbl_Customer_Log>
+    //{
+    //    public void Configure(EntityTypeBuilder<tbl_Customer_Log> builder)
+    //    {
+    //        builder.ToTable("tbl_Customer_Log");
+    //        builder.HasKey(e => new { e.Id }).HasName("PK_tbl_Customer_Log");
 
-            builder.Property(p => p.Id).HasComment("고유번호");
+    //        builder.Property(p => p.Id).HasComment("고유번호");
             
-        }
-    }
+    //    }
+    //}
 
     class CustomerDeliveryConfiguration : IEntityTypeConfiguration<tbl_Customer_Delivery>
     {

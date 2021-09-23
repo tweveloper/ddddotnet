@@ -13,6 +13,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="ValueObjects\tbl_Adjust_Master_Log.cs" />
+    <Compile Remove="ValueObjects\tbl_Brand_Log.cs" />
+    <Compile Remove="ValueObjects\tbl_Customer_Log.cs" />
+    <Compile Remove="ValueObjects\tbl_Influencer_Master_Log.cs" />
+    <Compile Remove="ValueObjects\tbl_Member_Log.cs" />
+    <Compile Remove="ValueObjects\tbl_ScmMember_Log.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MediatR" Version="9.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
   </ItemGroup>
