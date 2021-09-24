@@ -1,13 +1,5 @@
-using AllregoSoft.WebManagementSystem.WebAdmin.Infrastructure.Filters;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AllregoSoft.WebManagementSystem.WebAdmin
 {
@@ -24,9 +16,6 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                }).ConfigureServices(services =>
-                {
-                    services.AddTransient<IStartupFilter, SiteMapFilter>();
                 });
 
         private static readonly string _namespace = typeof(Startup).Namespace;
