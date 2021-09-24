@@ -28,5 +28,22 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure
 
             return services;
         }
+
+        public static IServiceCollection AddMemberInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddDbContext<MemberDbContext>(options =>
+            {
+                options.UseSqlServer(configuration["AWMS.Application.ConnectionString"],
+                          sqlServerOptionsAction: sqlOptions =>
+                          {
+                              sqlOptions.MigrationsAssembly(typeof(MemberDbContext).GetTypeInfo().Assembly.FullName);
+                              sqlOptions.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+                          });
+            }, ServiceLifetime.Scoped);
+
+            services.AddScoped<IMemberDbContext>(provider => provider.GetService<MemberDbContext>());
+
+            return services;
+        }
     }
 }

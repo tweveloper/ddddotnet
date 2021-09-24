@@ -202,6 +202,8 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin
 
                 // ASP.NET Core에서 클레임 매핑, 사용자 지정 및 변환 - https://docs.microsoft.com/ko-kr/aspnet/core/security/authentication/claims?view=aspnetcore-5.0
                 options.ClaimActions.MapUniqueJsonKey("account", "account");
+                options.ClaimActions.MapUniqueJsonKey("mem", "mem");
+                options.ClaimActions.MapUniqueJsonKey("rol", "rol");
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {

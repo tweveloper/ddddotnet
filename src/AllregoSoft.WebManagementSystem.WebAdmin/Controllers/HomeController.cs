@@ -19,18 +19,15 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Controllers
     {
         private readonly IMemberService _memberService;
         private readonly ILogger<HomeController> _logger;
-        private readonly IIdentityParser<ApplicationUser> _appUserParser;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public HomeController(
             ILogger<HomeController> logger, 
             IMemberService memberService,
-            IIdentityParser<ApplicationUser> appUserParser,
             IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _memberService = memberService;
-            _appUserParser = appUserParser;
             _httpContextAccessor = httpContextAccessor;
         } 
 

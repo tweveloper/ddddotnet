@@ -55,6 +55,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AllregoSoft.WebManagementSystem.Infrastructure\Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <TypeScriptCompile Include="wwwroot\bootstrap\assets\vendors\fullcalendar\dist\fullcalendar.d.ts" />
     <TypeScriptCompile Include="wwwroot\bootstrap\assets\vendors\metisMenu\types\metismenu.d.ts" />
     <TypeScriptCompile Include="wwwroot\bootstrap\assets\vendors\moment\moment.d.ts" />

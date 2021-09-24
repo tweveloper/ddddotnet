@@ -39,7 +39,7 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Controllers
 
         public virtual void Prepare()
         {
-            var identity = IdentityService.GetUserIdentity();
+            var identity = IdentityService.GetIdentityId();
 
 #if DEBUG
 
