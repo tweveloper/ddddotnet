@@ -64,12 +64,6 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
             return View(vm);
         }
 
-        public async Task<IActionResult> GetToken()
-        {
-            var token = await HttpContext.GetTokenAsync("access_token");
-            return View("Token",token);
-        }
-
         /// <summary>
         /// Handle postback from username/password login
         /// </summary>
@@ -111,7 +105,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
                     return Redirect("~/");
                 }
 
-                ModelState.AddModelError("", "Invalid username or password.");
+                ModelState.AddModelError("Invalid", "아이디 또는 비밀번호가 맞지 않습니다.");
             }
 
             // something went wrong, show form with error
@@ -226,64 +220,6 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
             var logout = await _interaction.GetLogoutContextAsync(model.LogoutId);
 
             return Redirect(logout?.PostLogoutRedirectUri);
-        }
-
-        // GET: /Account/Register
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Register(string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
-        }
-
-        //
-        // POST: /Account/Register
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model, CancellationToken cancellationToken, string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser
-                {
-                    Account = model.Email,
-                    UserName = model.Email,
-                    Email = model.Email,
-                };
-                var result = await _userManager.CreateAsync(user, model.Password);
-
-                //_context.tbl_ScmMember.Add(new Domain.Entities.tbl_ScmMember
-                //{
-                //    Name = model.Email,
-                //    UseYn = "Y",
-                //    IdentityId = user.Id
-                //});
-
-                //await _context.SaveChangesAsync(cancellationToken);
-
-                if (result.Errors.Count() > 0)
-                {
-                    AddErrors(result);
-                    // If we got this far, something failed, redisplay form
-                    return View(model);
-                }
-            }
-
-            if (returnUrl != null)
-            {
-                if (HttpContext.User.Identity.IsAuthenticated)
-                    return Redirect(returnUrl);
-                else
-                    if (ModelState.IsValid)
-                    return RedirectToAction("login", "account", new { returnUrl = returnUrl });
-                else
-                    return View(model);
-            }
-
-            return RedirectToAction("index", "home");
         }
 
         [HttpGet]

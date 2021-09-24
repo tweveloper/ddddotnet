@@ -1,28 +1,38 @@
 using AllregoSoft.WebManagementSystem.WebApi.Identity.Data;
 using AllregoSoft.WebManagementSystem.WebApi.Identity.Models;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace AllregoSoft.WebManagementSystem.WebApi.Identity
 {
     public class Program
     {
+        private static readonly string _namespace = typeof(Startup).Namespace;
+        public static readonly string AppName = _namespace.Substring(_namespace.LastIndexOf('.', _namespace.LastIndexOf('.') - 1) + 1);
+
         public async static Task Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
-            
-            using(var scope = host.Services.CreateScope())
+            var configuration = GetConfiguration();
+            Log.Logger = CreateSerilogLogger(configuration);
+            try
             {
-                var services = scope.ServiceProvider;
+                Log.Information("Configuring web host ({ApplicationContext})...", Program.AppName);
+                var host = BuildWebHost(configuration, args);
 
-                try
+                Log.Information("Applying migrations ({ApplicationContext})...", Program.AppName);
+                using (var scope = host.Services.CreateScope())
                 {
+                    var services = scope.ServiceProvider;
                     var context = services.GetRequiredService<ApplicationDbContext>();
 
                     if (context.Database.IsSqlServer())
@@ -32,28 +42,56 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity
 
                     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-                    //var identityContext = services.GetRequiredService<AwmsIdentityDbContext>();
 
                     await ApplicationDbContextSeed.SeedDefaultUserAsync(userManager, roleManager);
                 }
-                catch (Exception ex)
-                {
-                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-                    logger.LogError(ex, "An error occurred while migrating or seeding the database.");
-
-                    throw;
-                }
+                Log.Information("Starting web host ({ApplicationContext})...", Program.AppName);
+                host.Run();
             }
-
-            await host.RunAsync();
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Program terminated unexpectedly ({ApplicationContext})!", Program.AppName);
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+        private static Serilog.ILogger CreateSerilogLogger(IConfiguration configuration)
+        {
+            var logFilePath = configuration["Serilog:LogFilePath"];
+            return new LoggerConfiguration()
+                //.MinimumLevel.Verbose()
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day)
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
+        }
+
+        private static IConfiguration GetConfiguration()
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables();
+
+            var config = builder.Build();
+
+            return builder.Build();
+        }
+
+        public static IWebHost BuildWebHost(IConfiguration configuration, string[] args)
+        {
+            return WebHost.CreateDefaultBuilder(args)
+                        .CaptureStartupErrors(false)
+                        .ConfigureAppConfiguration(x => x.AddConfiguration(configuration))
+                        .UseStartup<Startup>()
+                        .UseContentRoot(Directory.GetCurrentDirectory())
+                        .UseSerilog()
+                        .Build();
+        }
     }
 }

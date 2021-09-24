@@ -41,61 +41,6 @@ namespace AllregoSoft.WebManagementSystem.WebApi
             services.AddCustomConfiguration(Configuration);
             services.AddCustomAuthentication(Configuration);
 
-            //services.AddDatabaseDeveloperPageExceptionFilter();
-
-            //services.AddSingleton<IIdentityService, IdentityService>();
-
-            //services.AddHttpContextAccessor();
-
-            //services.Configure<WebEncoderOptions>(options =>
-            //{
-            //    options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All); // 한글이 인코딩되는 문제 해결
-            //});
-
-
-            //services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))
-            //    .AddNewtonsoftJson(options =>
-            //    {
-            //        options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-            //        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-            //        //options.SerializerSettings.MaxDepth = 2;
-            //    });
-
-            //services.AddSwaggerGen(c =>
-            //{
-            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "AllregoSoft.WebManagementSystem.WebApi", Version = "v1" });
-
-            //    var securityScheme = new OpenApiSecurityScheme
-            //    {
-            //        Name = "JWT Authentication",
-            //        Description = "Enter JWT Bearer token **_only_**",
-            //        In = ParameterLocation.Header,
-            //        Type = SecuritySchemeType.Http,
-            //        Scheme = "bearer", // must be lower case
-            //        BearerFormat = "JWT",
-            //        Reference = new OpenApiReference
-            //        {
-            //            Id = JwtBearerDefaults.AuthenticationScheme,
-            //            Type = ReferenceType.SecurityScheme
-            //        }
-            //    };
-            //    c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
-            //    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            //    {
-            //        {securityScheme, new string[] { }}
-            //    });
-
-            //    // _OR_ enable the annotations on Controller classes [SwaggerTag], if no class comments present
-            //    c.EnableAnnotations();
-            //});
-
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddIdentityServerAuthentication(options =>
-            //    {
-            //        options.ApiName = "awms.api";
-            //        options.Authority = "https://localhost:44390";
-            //    });
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -132,7 +77,6 @@ namespace AllregoSoft.WebManagementSystem.WebApi
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IIdentityService, IdentityService>();
-            //services.AddSingleton<ICurrentUserService, CurrentUserService>();
 
             //services.AddHttpContextAccessor();
 
@@ -219,36 +163,6 @@ namespace AllregoSoft.WebManagementSystem.WebApi
 
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services, IConfiguration configuration)
         {
-            //services.AddSwaggerGen(options =>
-            //{
-            //    //options.DescribeAllEnumsAsStrings();
-            //    options.SwaggerDoc("v1", new OpenApiInfo
-            //    {
-            //        Title = "AWMS WebApi - HTTP API",
-            //        Version = "v1",
-            //        Description = "AllregoSoft WebManagement Service HTTP API"
-            //    });
-            //    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-            //    {
-            //        Type = SecuritySchemeType.OAuth2,
-            //        Flows = new OpenApiOAuthFlows()
-            //        {
-            //            Implicit = new OpenApiOAuthFlow()
-            //            {
-            //                AuthorizationUrl = new Uri($"{configuration.GetValue<string>("IdentityUrlExternal")}/connect/authorize"),
-            //                TokenUrl = new Uri($"{configuration.GetValue<string>("IdentityUrlExternal")}/connect/token"),
-            //                Scopes = new Dictionary<string, string>()
-            //                {
-            //                    { "awms.api", "Allregosoft WebManagement Service Web API" }
-            //                }
-            //            }
-            //        }
-            //    });
-
-            //    options.OperationFilter<AuthorizeCheckOperationFilter>();
-            //});
-
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AllregoSoft.WebManagementSystem.WebApi", Version = "v1" });
@@ -275,7 +189,6 @@ namespace AllregoSoft.WebManagementSystem.WebApi
 
                 c.OperationFilter<AuthorizeCheckOperationFilter>();
             });
-
 
             return services;
         }

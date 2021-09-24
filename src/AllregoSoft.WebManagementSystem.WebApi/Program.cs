@@ -1,11 +1,14 @@
 using AllregoSoft.WebManagementSystem.Infrastructure.Data;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,43 +16,77 @@ namespace AllregoSoft.WebManagementSystem.WebApi
 {
     public class Program
     {
-        //public static void Main(string[] args)
-        //{
-        //    CreateHostBuilder(args).Build().Run();
-        //}
+        private static readonly string _namespace = typeof(Startup).Namespace;
+        public static readonly string AppName = _namespace.Substring(_namespace.LastIndexOf('.', _namespace.LastIndexOf('.') - 1) + 1);
 
         public async static Task Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
+            var configuration = GetConfiguration();
+            Log.Logger = CreateSerilogLogger(configuration);
 
-            using (var scope = host.Services.CreateScope())
+            try
             {
-                var services = scope.ServiceProvider;
+                Log.Information("Configuring web host ({ApplicationContext})...", Program.AppName);
+                var host = BuildWebHost(configuration, args);
 
-                try
+                Log.Information("Applying migrations ({ApplicationContext})...", Program.AppName);
+                using (var scope = host.Services.CreateScope())
                 {
+                    var services = scope.ServiceProvider;
                     var context = services.GetRequiredService<AwmsDbContext>();
 
                     await AwmsDbContextSeed.SeedDefaultDataAsync(context);
                 }
-                catch (Exception ex)
-                {
-                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-                    logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+                Log.Information("Starting web host ({ApplicationContext})...", Program.AppName);
+                host.Run();
 
-                    throw;
-                }
             }
-
-            await host.RunAsync();
+            catch(Exception ex)
+            {
+                Log.Fatal(ex, "Program terminated unexpectedly ({ApplicationContext})!", Program.AppName);
+                throw;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }     
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+        public static IWebHost BuildWebHost(IConfiguration configuration, string[] args)
+        {
+            return WebHost.CreateDefaultBuilder(args)
+                        .CaptureStartupErrors(false)
+                        .ConfigureAppConfiguration(x => x.AddConfiguration(configuration))
+                        .UseStartup<Startup>()
+                        .UseContentRoot(Directory.GetCurrentDirectory())
+                        .UseSerilog()
+                        .Build();
+        }
+
+        public static Serilog.ILogger CreateSerilogLogger(IConfiguration configuration)
+        {
+            var logFilePath = configuration["Serilog:LogFilePath"];
+
+            return new LoggerConfiguration()
+                //.MinimumLevel.Verbose()
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day)
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
+        }
+
+        public static IConfiguration GetConfiguration()
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables();
+
+            var config = builder.Build();
+
+            return builder.Build();
+        }
     }
 }

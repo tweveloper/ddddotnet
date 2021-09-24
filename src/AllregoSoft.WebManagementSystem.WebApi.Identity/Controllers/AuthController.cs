@@ -37,19 +37,21 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Controllers
             return Ok(userId);
         }
 
-        //
         // POST: /api/auth/create
         [HttpPost("[action]")]
         [AllowAnonymous]
-        public async Task<IActionResult> Create([FromBody] RegisterViewModel model)
+        public async Task<IActionResult> Create([FromBody] AuthViewModel model)
         {
             var user = new ApplicationUser
             {
-                Account = model.Email,
-                UserName = model.Email,
+                Account = model.Account,
+                UserName = model.Name,
                 Email = model.Email,
             };
-            var result = await _userManager.CreateAsync(user, model.Password);
+            // TODO : 비밀번호 초기값으로 할지 받을지 추후 변경
+            // 일단 초기 비밀번호로 진행
+            //var result = await _userManager.CreateAsync(user, model.Password);
+            var result = await _userManager.CreateAsync(user, "Pa$$word");
             if (result.Errors.Count() > 0)
             {
                 return BadRequest(result.Errors);

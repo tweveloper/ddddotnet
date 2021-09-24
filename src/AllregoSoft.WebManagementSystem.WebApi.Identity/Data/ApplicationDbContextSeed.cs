@@ -26,29 +26,6 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Data
                 await userManager.AddToRolesAsync(administrator, new[] { administratorRole.Name });
                 //await userManager.AddClaimAsync(administrator, adminClaim);
             }
-
-            //if (!context.tbl_ScmMember.Any())
-            //{
-            //    context.tbl_ScmMember.Add(new tbl_ScmMember
-            //    {
-            //        Name = administrator.UserName,
-            //        UseYn = "Y",
-            //        IdentityId = administrator.Id
-            //    });
-
-            //    await context.SaveChangesAsync(System.Threading.CancellationToken.None);
-            //}
-
-            //if (!context.tbl_Member.Any())
-            //{
-            //    context.tbl_Member.Add(new tbl_Member
-            //    {
-            //        UseYn = "Y",
-            //        IdentityId = administrator.Id
-            //    });
-
-            //    await context.SaveChangesAsync(System.Threading.CancellationToken.None);
-            //}
         }
     }
 }
