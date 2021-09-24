@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
 {
     [Authorize]
-    public class MemberController : ApiControllerBase
+    public class SiteMapController : ApiControllerBase
     {
         [HttpGet("[action]")]
-        public async Task<tbl_Member> GetMemberByIdAsync(string identityId)
+        public async Task<List<tbl_SiteMap>> GetSiteMap(long roleId)
         {
-            return await Mediator.Send(new GetMemberQuery { IdentityId = identityId });
+            return await Mediator.Send(new GetSiteMapQuery { RoleId = roleId });
         }
 
         //[HttpGet("{id}")]
@@ -28,10 +28,10 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
         //    return await Mediator.Send(new GetMemberQuery { IdentityId = id });
         //}
 
-        [HttpPost]
-        public async Task<ActionResult<long>> Create(CreateMemberCommand command)
-        {
-            return await Mediator.Send(command);
-        }
+        //[HttpPost]
+        //public async Task<ActionResult<long>> Create(CreateMemberCommand command)
+        //{
+        //    return await Mediator.Send(command);
+        //}
     }
 }

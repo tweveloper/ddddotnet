@@ -1,40 +1,43 @@
-﻿@using Newtonsoft.Json.Linq
+﻿@using AllregoSoft.WebManagementSystem.WebAdmin.Infrastructure.Helper 
+@{
+    var SiteMapList = SessionHelper.SiteMaps;
+}
 
 <aside class="page-sidebar">
     <div class="page-logo">
         <a href="/" class="page-logo-link press-scale-down d-flex align-items-center position-relative">
-            <span class="page-logo-text mr-1">AWMS Admin</span>
+            <span class="page-logo-text mr-1">통합 Admin</span>
             <span class="position-absolute text-white opacity-50 small pos-top pos-right mr-2 mt-n2"></span>
         </a>
     </div>
     <!-- BEGIN PRIMARY NAVIGATION -->
     <nav id="js-primary-nav" class="primary-nav" role="navigation">
         <ul id="js-nav-menu" class="nav-menu">
-            @if (TempData["SiteMap"] != null)
+            @if (SiteMapList != null)
             {
-                foreach (var FirstMap in TempData["SiteMap"] as JArray)
+                foreach (var FirstMap in SiteMapList)
                 {
-                    <li class="@(FirstMap["ParentMap"]["Active"].ToString() == "true" ? "active open" : "")">
-                        <a href="#" title="@FirstMap["ParentMap"]["Name"]" @(FirstMap["ParentMap"]["Active"].ToString() == "true" ? "aria-expanded=true" : "")>
+                    <li class="@(FirstMap.Clicked == true ? "active open" : "")">
+                        <a href="#" title="@FirstMap.Name" @(FirstMap.Clicked == true ? "aria-expanded=true" : "")>
                             @*<i class="fal fa-info-circle"></i>*@
-                            <span class="nav-link-text">@FirstMap["ParentMap"]["Name"]</span>
+                            <span class="nav-link-text">@FirstMap.Name</span>
                         </a>
                         <ul>
-                            @foreach (var SecondMap in FirstMap["SecondMaps"])
+                            @foreach (var SecondMap in FirstMap.ChildMaps)
                             {
-                                @if (SecondMap["ThirdMaps"].Count() > 0)
+                                @if (SecondMap.ChildMaps != null && SecondMap.ChildMaps.Count() > 0)
                                 {
-                                    <li class="@(SecondMap["Active"].ToString() == "true" ? "active open" : "")">
-                                        <a href="#" title="@SecondMap["Name"]" @(SecondMap["Active"].ToString() == "true" ? "aria-expanded=true" : "")>
+                                    <li class="@(SecondMap.Clicked == true ? "active open" : "")">
+                                        <a href="#" title="@SecondMap.Name" @(SecondMap.Clicked == true ? "aria-expanded=true" : "")>
                                             @*<i class="fal fa-info-circle"></i>*@
-                                            <span class="nav-link-text">@SecondMap["Name"]</span>
+                                            <span class="nav-link-text">@SecondMap.Name</span>
                                         </a>
                                         <ul>
-                                            @foreach (var ThirdMap in SecondMap["ThirdMaps"])
+                                            @foreach (var ThirdMap in SecondMap.ChildMaps)
                                             {
-                                                <li class="@(ThirdMap["Active"].ToString() == "true" ? "active" : "")">
-                                                    <a href="@ThirdMap["Path"]" title="@ThirdMap["Name"]" id="@ThirdMap["Id"]">
-                                                        <span class="nav-link-text">@ThirdMap["Name"]</span>
+                                                <li class="@(ThirdMap.Clicked == true ? "active" : "")">
+                                                    <a href="@ThirdMap.Path" title="@ThirdMap.Name">
+                                                        <span class="nav-link-text">@ThirdMap.Name</span>
                                                     </a>
                                                 </li>
                                             }
@@ -43,10 +46,10 @@
                                 }
                                 else
                                 {
-                                    <li @(SecondMap["Active"].ToString() == "true" ? "class=active" : "")>
-                                        <a href="@SecondMap["Path"]" title="@SecondMap["Name"]" id="@SecondMap["Id"]">
+                                    <li class="@(SecondMap.Clicked == true ? "active" : "")">
+                                        <a href="@SecondMap.Path" title="@SecondMap.Name">
                                             @*<i class="fal fa-info-circle"></i>*@
-                                            <span class="nav-link-text">@SecondMap["Name"]</span>
+                                            <span class="nav-link-text">@SecondMap.Name</span>
                                         </a>
                                     </li>
                                 }
@@ -54,9 +57,6 @@
                         </ul>
                     </li>
                 }
-                //TempData["SiteMap"] 데이터 유지
-                //TempData.Keep("SiteMap");
-                TempData.Keep();
             }
         </ul>
     </nav>
