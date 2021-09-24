@@ -154,6 +154,11 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin
                    .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
                    .AddHttpMessageHandler<HttpClientRequestIdDelegatingHandler>();
 
+            services.AddHttpClient<ISiteMapService, SiteMapService>()
+                   //.SetHandlerLifetime(TimeSpan.FromMinutes(5))  //Sample. Default lifetime is 2 minutes
+                   .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
+                   .AddHttpMessageHandler<HttpClientRequestIdDelegatingHandler>();
+
             //services.AddScoped<SiteMapFilter>();
             //services.AddScoped<InitFilter>();
             //services.AddHttpClient<ICatalogService, CatalogService>()

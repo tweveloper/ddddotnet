@@ -24,6 +24,7 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Controllers
 
         private IMemberService _memberService { get { return HttpContext.RequestServices?.GetService<IMemberService>(); } }
         private IScmMemberService _scmMemberService { get { return HttpContext.RequestServices?.GetService<IScmMemberService>(); } }
+        private ISiteMapService _siteMapService { get { return HttpContext.RequestServices?.GetService<ISiteMapService>(); } }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
@@ -40,10 +41,11 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Controllers
         public virtual void Prepare()
         {
             var identity = IdentityService.GetIdentityId();
+            var roleId = IdentityService.GetRoleId();
 
 #if DEBUG
 
-            if(IdentityService.GetClaimsPrincipal().HasClaim(c => c.Type == "account"))
+            if (IdentityService.GetClaimsPrincipal().HasClaim(c => c.Type == "account"))
             {
                 var identityAccount = IdentityService.GetClaimsPrincipal().FindFirst("account").Value;
                 if (identityAccount != null && identityAccount.Equals("admin"))
@@ -67,6 +69,13 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Controllers
             if(SessionHelper.ScmMember == null)
             {
                 SessionHelper.ScmMember = member;
+            }
+
+            var SiteMap = _siteMapService.GetSiteMap(roleId).GetAwaiter().GetResult();
+
+            if (SessionHelper.SiteMaps == null)
+            {
+                SessionHelper.SiteMaps = SiteMap;
             }
         }
     }

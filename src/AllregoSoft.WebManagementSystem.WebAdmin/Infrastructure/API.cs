@@ -22,5 +22,12 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Infrastructure
             public static string GetScmMemberByIdentity(string baseUri, string identityId) => $"{baseUri}/GetMemberByIdAsync/{identityId}";
             public static string CreateScmMember(string baseUri) => $"{baseUri}/Create";
         }
+
+        public static class SiteMap
+        {
+            public static string GetSiteMap(string baseUri, long RoleId) => $"{baseUri}/GetSiteMap?roleId={RoleId}";
+            //public static string GetScmMemberByIdentity(string baseUri, string identityId) => $"{baseUri}/GetMemberByIdAsync/{identityId}";
+            //public static string CreateScmMember(string baseUri) => $"{baseUri}/Create";
+        }
     }
 }
