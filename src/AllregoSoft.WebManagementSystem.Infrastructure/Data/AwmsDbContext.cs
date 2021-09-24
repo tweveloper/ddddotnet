@@ -47,12 +47,12 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        entry.Entity.RegId = _identityService == null ? 0 : _identityService.GetUserId();
+                        entry.Entity.RegId = _identityService == null ? 0 : _identityService.GetMemberId();
                         entry.Entity.RegDt = DateTime.Now;
                         break;
 
                     case EntityState.Modified:
-                        entry.Entity.ModId = _identityService == null ? 0 : _identityService.GetUserId();
+                        entry.Entity.ModId = _identityService == null ? 0 : _identityService.GetMemberId();
                         entry.Entity.ModDt = DateTime.Now;
                         break;
                 }
@@ -145,7 +145,7 @@ namespace AllregoSoft.WebManagementSystem.Infrastructure.Data
         {
             var optionsBuilder = new DbContextOptionsBuilder<AwmsDbContext>()
                     .UseSqlServer(
-                        "data source=localhost;initial catalog=AWMS;persist security info=True;user id=sa;password=Pa$$w0rd",
+                        "data source=192.168.0.10;initial catalog=UNION_ADMIN;persist security info=True;user id=sa;password=allrego0329!#",
                         b => b.MigrationsAssembly(typeof(AwmsDbContext).Assembly.FullName));
 
             return new AwmsDbContext(optionsBuilder.Options, null, null);

@@ -1,4 +1,5 @@
-﻿using AllregoSoft.WebManagementSystem.WebApi.Identity.Models;
+﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces;
+using AllregoSoft.WebManagementSystem.WebApi.Identity.Models;
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
@@ -15,10 +16,12 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Services
     public class ProfileService : IProfileService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMemberDbContext _memberDbContext;
 
-        public ProfileService(UserManager<ApplicationUser> userManager)
+        public ProfileService(UserManager<ApplicationUser> userManager, IMemberDbContext memberDbContext)
         {
             _userManager = userManager;
+            _memberDbContext = memberDbContext;
         }
 
         async public Task GetProfileDataAsync(ProfileDataRequestContext context)
@@ -73,6 +76,17 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity.Services
                 new Claim(JwtClaimTypes.PreferredUserName, user.UserName),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
             };
+
+            var member = _memberDbContext.tbl_ScmMember.Where(x => x.IdentityId.Equals(user.Id.ToString())).Select(x => new { Id = x.Id, RoleId = x.RoleId }).FirstOrDefault();
+
+            if(member != null)
+            {
+                claims.Add(new Claim("mem", member.Id.ToString()));
+                if(member.RoleId != null)
+                {
+                    claims.Add(new Claim("rol", member.RoleId.ToString()));
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(user.Account))
                 claims.Add(new Claim("account", user.Account));

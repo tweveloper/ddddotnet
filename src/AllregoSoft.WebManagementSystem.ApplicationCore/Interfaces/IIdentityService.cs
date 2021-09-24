@@ -4,9 +4,10 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Interfaces
 {
     public interface IIdentityService
     {
-        string GetUserIdentity();
+        string GetIdentityId();
         string GetUserName();
-        long GetUserId();
+        long GetMemberId();
+        long GetRoleId();
         ClaimsPrincipal GetClaimsPrincipal();
     }
 }

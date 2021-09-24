@@ -21,7 +21,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Behaviours
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
-            var userId = _identityService.GetUserId();
+            var userId = _identityService.GetMemberId();
 
             _logger.LogInformation("----- Handling command {CommandName} {@UserId} ({@Command})", request.GetGenericTypeName(), userId, request);
             var response = await next();

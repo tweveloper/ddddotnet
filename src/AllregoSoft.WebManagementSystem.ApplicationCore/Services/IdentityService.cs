@@ -13,12 +13,12 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public long GetUserId()
+        public long GetMemberId()
         {
-            return long.Parse(_context.HttpContext.User.FindFirst("mem")?.Value ?? "0");
+            return long.Parse(_context.HttpContext == null ? "0" : _context.HttpContext.User.FindFirst("mem")?.Value ?? "0");
         }
 
-        public string GetUserIdentity()
+        public string GetIdentityId()
         {
             return _context.HttpContext.User.FindFirst("sub").Value;
         }
@@ -31,6 +31,10 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Services
         public ClaimsPrincipal GetClaimsPrincipal()
         {
             return _context.HttpContext.User;
+        }
+        public long GetRoleId()
+        {
+            return long.Parse(_context.HttpContext.User.FindFirst("rol")?.Value ?? "0");
         }
     }
 }

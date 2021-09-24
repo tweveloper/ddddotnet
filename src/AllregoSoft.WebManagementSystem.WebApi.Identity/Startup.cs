@@ -1,3 +1,4 @@
+using AllregoSoft.WebManagementSystem.Infrastructure;
 using AllregoSoft.WebManagementSystem.WebApi.Identity.Configuration;
 using AllregoSoft.WebManagementSystem.WebApi.Identity.Data;
 using AllregoSoft.WebManagementSystem.WebApi.Identity.Interfaces;
@@ -32,7 +33,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddIdentityInfrastructure(Configuration);
+            services.AddMemberInfrastructure(Configuration);
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration["AWMS.Identity.ConnectionString"],
@@ -112,7 +113,7 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Identity
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                InitializeDbTestData(app, configuration); // 기초데이터 삽입ㄴ
+                InitializeDbTestData(app, configuration); // 기초데이터 삽입
             }
             else
             {

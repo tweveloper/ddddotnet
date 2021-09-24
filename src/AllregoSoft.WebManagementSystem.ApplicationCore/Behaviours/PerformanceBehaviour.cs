@@ -36,7 +36,7 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Behaviours
             if (elapsedMilliseconds > 500)
             {
                 var requestName = typeof(TRequest).Name;
-                var userId = _identityService.GetUserId();
+                var userId = _identityService.GetMemberId();
 
                 _logger.LogWarning("AWMS Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@UserId} {@Request}",
                     requestName, elapsedMilliseconds, userId, request);
