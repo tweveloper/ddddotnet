@@ -57,10 +57,24 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateSiteMap([FromBody] CreateSiteMapCommand command)
+        {
+            var result = await _siteMapService.CreateSiteMap(command);
+            return Ok(result);
+        }
+
         [HttpPut]
         public async Task<IActionResult> ChangePosition([FromBody] ChangePositionCommand command)
         {
             var result = await _siteMapService.ChangePosition(command);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteSiteMap([FromBody] DeleteSiteMapCommand command)
+        {
+            var result = await _siteMapService.DeleteSiteMap(command);
             return Ok(result);
         }
     }

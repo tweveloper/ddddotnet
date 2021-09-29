@@ -41,10 +41,22 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
             return await Mediator.Send(command);
         }
 
+        [HttpPost("[action]")]
+        public async Task<ActionResult<string>> CreateSiteMap(CreateSiteMapCommand command)
+        {
+            return await Mediator.Send(command);
+        }
+
         [HttpPut("[action]")]
         public async Task<ActionResult<string>> ChangePosition(ChangePositionCommand command)
         {
             return await Mediator.Send(command);
+        }
+
+        [HttpPut("[action]")]
+        public async Task<ActionResult<string>> DeleteSiteMap(DeleteSiteMapCommand command)
+        {
+            return await Mediator.Send(command);
+        }
     }
-}
 }

@@ -97,6 +97,20 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Services
             return responseString;
         }
 
+        public async Task<string> CreateSiteMap(CreateSiteMapCommand command)
+        {
+            var uri = API.SiteMap.CreateSiteMap(_apiBaseUrl);
+            _logger.LogDebug("[CreateSiteMap] -> Calling {Uri} to get the CreateSiteMap", uri);
+
+            var data = new StringContent(JsonConvert.SerializeObject(command), System.Text.Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(uri, data);
+
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            return responseString;
+        }
+
         public async Task<string> ChangePosition(ChangePositionCommand command)
         {
             var uri = API.SiteMap.ChangePosition(_apiBaseUrl);
@@ -104,6 +118,21 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Services
 
             var data = new StringContent(JsonConvert.SerializeObject(command), System.Text.Encoding.UTF8, "application/json");
 
+            var response = await _httpClient.PutAsync(uri, data);
+
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            return responseString;
+        }
+
+        public async Task<string> DeleteSiteMap(DeleteSiteMapCommand command)
+        {
+            var uri = API.SiteMap.DeleteSiteMap(_apiBaseUrl);
+            _logger.LogDebug("[DeleteSiteMap] -> Calling {Uri} to get the DeleteSiteMap", uri);
+
+            var data = new StringContent(JsonConvert.SerializeObject(command), System.Text.Encoding.UTF8, "application/json");
+
+            //var response = await _httpClient.DeleteAsync(uri);
             var response = await _httpClient.PutAsync(uri, data);
 
             var responseString = await response.Content.ReadAsStringAsync();

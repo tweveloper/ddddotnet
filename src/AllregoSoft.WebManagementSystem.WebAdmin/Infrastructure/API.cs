@@ -29,7 +29,9 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Infrastructure
             public static string SiteMapInfo(string baseUri, long Id) => $"{baseUri}/SiteMapInfo?Id={Id}";
             public static string UpdateSiteMapInfo(string baseUri) => $"{baseUri}/UpdateSiteMapInfo";
             public static string CreateRootNode(string baseUri) => $"{baseUri}/CreateRootNode";
+            public static string CreateSiteMap(string baseUri) => $"{baseUri}/CreateSiteMap";
             public static string ChangePosition(string baseUri) => $"{baseUri}/ChangePosition";
+            public static string DeleteSiteMap(string baseUri) => $"{baseUri}/DeleteSiteMap";
         }
     }
 }

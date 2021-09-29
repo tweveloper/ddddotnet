@@ -13,6 +13,8 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Services
         Task<tbl_SiteMap> SiteMapInfo(long id);
         Task<string> UpdateSiteMapInfo(UpdateSiteMapInfoCommand command);
         Task<string> CreateRootNode(CreateRootNodeCommand command);
+        Task<string> CreateSiteMap(CreateSiteMapCommand command);
         Task<string> ChangePosition(ChangePositionCommand command);
+        Task<string> DeleteSiteMap(DeleteSiteMapCommand command); 
     }
 }

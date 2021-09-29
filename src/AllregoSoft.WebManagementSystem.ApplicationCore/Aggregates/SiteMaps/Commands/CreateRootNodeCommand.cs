@@ -2,6 +2,7 @@
 using AllregoSoft.WebManagementSystem.Domain.Entities;
 using AllregoSoft.WebManagementSystem.Domain.Events;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading;
@@ -23,7 +24,14 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Aggregates.SiteMaps.Co
         }
         public async Task<string> Handle(CreateRootNodeCommand request, CancellationToken cancellationToken)
         {
-            var position = _context.tbl_SiteMap.Where(x => x.Depth == 1 && x.State == "0").Max(x => x.Position);
+            int position = 1;
+            var sitemap = await _context.tbl_SiteMap.Where(x => x.Depth == 1 && x.State == "0").ToListAsync();
+
+            if (sitemap.Count > 0)
+            {
+                position = sitemap.Max(x => x.Position) + 1;
+            }
+
             var entity = new tbl_SiteMap
             {
                 Name = request.Name,

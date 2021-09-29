@@ -42,4 +42,14 @@ namespace AllregoSoft.WebManagementSystem.Domain.Events
 
         public tbl_SiteMap Item { get; }
     }
+
+    public class DeleteSiteMapCompletedEvent : DomainEvent
+    {
+        public DeleteSiteMapCompletedEvent(tbl_SiteMap item)
+        {
+            Item = item;
+        }
+
+        public tbl_SiteMap Item { get; }
+    }
 }
