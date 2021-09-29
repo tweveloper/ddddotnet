@@ -2,10 +2,6 @@
 using AllregoSoft.WebManagementSystem.Domain.Entities;
 using AllregoSoft.WebManagementSystem.Domain.Events;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +9,6 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Aggregates.SiteMaps.Co
 {
     public class CreateSiteMapCommand : IRequest<long>
     {
-        //public string IdentityId { get; set; }
         public int RoleId { get; set; }
     }
 
@@ -29,11 +24,9 @@ namespace AllregoSoft.WebManagementSystem.ApplicationCore.Aggregates.SiteMaps.Co
             var entity = new tbl_SiteMap
             {
                 RoleId = request.RoleId
-                //IdentityId = request.IdentityId,
-                //KeyId = request.KeyId
             };
 
-            entity.DomainEvents.Add(new SiteMapCreatedEvent(entity));
+            entity.DomainEvents.Add(new CreateSiteMapCreatedEvent(entity));
 
             _context.tbl_SiteMap.Add(entity);
 

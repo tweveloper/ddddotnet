@@ -10,23 +10,23 @@ using System.Threading.Tasks;
 
 namespace AllregoSoft.WebManagementSystem.ApplicationCore.Aggregates.SiteMaps.Queries
 {
-    public class GetSiteMapQuery : IRequest<List<tbl_SiteMap>>
+    public class GetRoleSiteMapQuery : IRequest<List<tbl_SiteMap>>
     {
         public long RoleId { get; set; }
     }
 
-    public class GetSiteMapQueryHandler : IRequestHandler<GetSiteMapQuery, List<tbl_SiteMap>>
+    public class GetRoleSiteMapQueryHandler : IRequestHandler<GetRoleSiteMapQuery, List<tbl_SiteMap>>
     {
         private readonly IApplicationDbContext _context;
         private IMapper _mapper;
 
-        public GetSiteMapQueryHandler(IApplicationDbContext context, IMapper mapper)
+        public GetRoleSiteMapQueryHandler(IApplicationDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        public async Task<List<tbl_SiteMap>> Handle(GetSiteMapQuery request, CancellationToken cancellationToken)
+        public async Task<List<tbl_SiteMap>> Handle(GetRoleSiteMapQuery request, CancellationToken cancellationToken)
         {
             var SiteMap = await (from x in _context.tbl_Role_Mapping.Where(x => x.RoleId == request.RoleId)
                                  join a in _context.tbl_SiteMap.Where(a => a.State == "0" && a.Active == true && a.Parent == 0) on x.SiteMapId equals a.Id

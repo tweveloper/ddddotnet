@@ -1,12 +1,9 @@
-﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Aggregates.Members.Commands.CreateMember;
-using AllregoSoft.WebManagementSystem.ApplicationCore.Aggregates.Members.Queries;
+﻿﻿using AllregoSoft.WebManagementSystem.ApplicationCore.Aggregates.SiteMaps.Commands;
 using AllregoSoft.WebManagementSystem.ApplicationCore.Aggregates.SiteMaps.Queries;
 using AllregoSoft.WebManagementSystem.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
@@ -15,23 +12,39 @@ namespace AllregoSoft.WebManagementSystem.WebApi.Controllers
     public class SiteMapController : ApiControllerBase
     {
         [HttpGet("[action]")]
-        public async Task<List<tbl_SiteMap>> GetSiteMap(long roleId)
+        public async Task<List<tbl_SiteMap>> GetRoleSiteMap(long roleId)
         {
-            return await Mediator.Send(new GetSiteMapQuery { RoleId = roleId });
+            return await Mediator.Send(new GetRoleSiteMapQuery { RoleId = roleId });
         }
 
-        //[HttpGet("{id}")]
-        //public async Task<tbl_Member> GetMemberByIdentityIdAsync(Guid id)
-        //{
-        //    //var userName = IdentityService.GetUserName();
-        //    //var identity = IdentityService.GetUserIdentity();
-        //    return await Mediator.Send(new GetMemberQuery { IdentityId = id });
-        //}
+        [HttpGet("[action]")]
+        public async Task<List<tbl_SiteMap>> SiteMapList()
+        {
+            return await Mediator.Send(new SiteMapListQuery { });
+        }
 
-        //[HttpPost]
-        //public async Task<ActionResult<long>> Create(CreateMemberCommand command)
-        //{
-        //    return await Mediator.Send(command);
-        //}
+        [HttpGet("[action]")]
+        public async Task<tbl_SiteMap> SiteMapInfo(long Id)
+        {
+            return await Mediator.Send(new SiteMapInfoQuery { Id = Id });
+        }
+
+        [HttpPut("[action]")]
+        public async Task<ActionResult<string>> UpdateSiteMapInfo(UpdateSiteMapInfoCommand command)
+        {
+            return await Mediator.Send(command);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<ActionResult<string>> CreateRootNode(CreateRootNodeCommand command)
+        {
+            return await Mediator.Send(command);
+        }
+
+        [HttpPut("[action]")]
+        public async Task<ActionResult<string>> ChangePosition(ChangePositionCommand command)
+        {
+            return await Mediator.Send(command);
     }
+}
 }

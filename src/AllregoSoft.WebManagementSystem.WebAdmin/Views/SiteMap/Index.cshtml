@@ -1,4 +1,5 @@
-﻿@{
+﻿@using AllregoSoft.WebManagementSystem.WebAdmin.Infrastructure.Helper
+@{
     ViewData["Title"] = "메뉴관리";
 }
 @section css{
@@ -10,21 +11,21 @@
 @section scripts{
     <script type="text/javascript" src="~/bootstrap/js/datagrid/datatables/datatables.bundle.js"></script>
     <script type="text/javascript" src="~/bootstrap/js/jstree-js/jstree.js"></script>
-    @*<script>
+    <script>
     $(document).ready(function () {
         //메뉴 호출 API
-        fetch('@Startup.appSettings["ApiDomain"]/SiteMap/SiteMapList',
+        fetch('/SiteMap/SiteMapList',
             {
-                method: 'GET',
-                headers: AWUtil.headers('json')
+            method: 'GET'
             })
             .then(response => response.json())
             .then(function (data) {
                 var sitemap = new Array();
 
                 $.each(data, function (idx, item) {
-                    sitemap[idx] = { id: item.Id, parent: item.Parent, text: item.Name, position: item.Position }
+                sitemap[idx] = { id: item.Id, parent: item.Parent == 0 ? "#" : item.Parent.toString(), text: item.Name, position: item.Position }
                 });
+
                 $('#tree').jstree({
                     'plugins': ['wholerow', 'dnd', 'contextmenu', 'types'],
                     'core': {
@@ -43,20 +44,20 @@
                     'contextmenu': {
                         'items': function (node) {
                             return {
-                                @if (TempData["C"].ToString() != "Y")
+                            @*@if (TempData["C"].ToString() != "Y")
                                 {
                                     @:'create': false,
                                 }
                                 else
                                 {
-                                    <text>
+                                <text>*@
                                 'create': {
                                     'separator_before': false,
                                     'separator_after': true,
                                     'label': 'Create',
                                     'action': function (obj) { $("#tree").jstree(true).create_node(node); }
                                 },
-                                    </text>
+                                @*</text>
                                 }
                                 @if (TempData["U"].ToString() != "Y")
                                 {
@@ -64,14 +65,14 @@
                                 }
                                 else
                                 {
-                                    <text>
+                                <text>*@
                                 'rename': {
                                     'separator_before': false,
                                     'separator_after': true,
                                     'label': 'Rename',
                                     'action': function (obj) { $("#tree").jstree(true).edit(node); }
                                 },
-                                    </text>
+                                @*</text>
                                 }
                                 @if (TempData["D"].ToString() != "Y")
                                 {
@@ -79,15 +80,15 @@
                                 }
                                 else
                                 {
-                                    <text>
+                                <text>*@
                                 'remove': {
                                     'separator_before': false,
                                     'separator_after': true,
                                     'label': 'Delete',
                                     'action': function (obj) { $("#tree").jstree(true).delete_node(node); }
                                 },
-                                    </text>
-                                }
+                            //    </text>
+                            //}
                                 'ccp': false
                             };
                         }
@@ -97,7 +98,7 @@
                 }).on('select_node.jstree', function (e, data) {
                     if (!isNaN(data.selected[0])) {
                         $.ajax({
-                            url: '@Startup.appSettings["ApiDomain"]/SiteMap/SiteMapInfo',
+                        url: '/SiteMap/SiteMapInfo',
                             type: 'GET',
                             dataType: 'json',
                             contentType: 'application/json; charset=UTF-8',
@@ -124,23 +125,23 @@
                     } else {
                         Swal.fire('고유번호가 필요합니다.');
                     }
-                @if (TempData["U"].ToString() == "Y")
+            @*@if (TempData["U"].ToString() == "Y")
                 {
-                    <text>
+                <text>*@
                     }).on('rename_node.jstree', function (e, data) {
-                        //추가 or 업데이트
+                    //업데이트
                         var jsonnode = $.extend({ 'id': data.node.id }, { 'name': data.node.text }, { 'parent': data.node.parent }, { 'depth': data.node.parents.length });
                         var jsondata = JSON.stringify(jsonnode);
 
-                        fetch('@Startup.appSettings["ApiDomain"]/SiteMap/AddOrUpdate',
+                    fetch('/SiteMap/UpdateSiteMapInfo',
                         {
-                            method: 'POST',
+                        method: 'PUT',
                             body: jsondata,
-                            headers: AWUtil.headers('json')
+                        headers: { 'Content-Type': 'application/json;' }
                         })
                         .then(response => response.json())
                         .then(function (data) {
-                            if (data.result == 'true') {
+                        if (data == true) {
                                 Swal.fire('저장에 성공했습니다.');
                             } else {
                                 Swal.fire('저장에 실패했습니다.');
@@ -150,7 +151,8 @@
                         .catch(error => console.error('Error:', error));
                     }).on('move_node.jstree', function (e, data) {
                         //순서 변경
-                        var jsonnode = $.extend({ 'id': data.node.id },
+                    var jsonnode = $.extend(
+                        { 'id': data.node.id },
                             { 'parent': data.node.parent },
                             { 'old_parent': data.old_parent },
                             { 'new_position': (data.position + 1) },
@@ -158,15 +160,15 @@
                         );
                         var jsondata = JSON.stringify(jsonnode);
 
-                        fetch('@Startup.appSettings["ApiDomain"]/SiteMap/ChangePosition',
+                    fetch('/SiteMap/ChangePosition',
                         {
-                            method: 'POST',
+                        method: 'PUT',
                             body: jsondata,
-                            headers: AWUtil.headers('json')
+                        headers: { 'Content-Type': 'application/json;' }
                         })
                         .then(response => response.json())
                         .then(function (data) {
-                            if (data.result == 'true') {
+                        if (data == true) {
                                 Swal.fire('저장에 성공했습니다.');
                             } else {
                                 Swal.fire('저장에 실패했습니다.');
@@ -174,20 +176,20 @@
                             //setTimeout(function () { location.reload(); }, 500);
                         })
                         .catch(error => console.error('Error:', error));
-                    </text>
+                @*</text>
                 }
                 @if (TempData["D"].ToString() == "Y")
                 {
-                    <text>
+                <text>*@
                     }).on('delete_node.jstree', function (e, data) {
                         var jsonnode = { 'id': data.node.id };
                         var jsondata = JSON.stringify(jsonnode);
 
-                        fetch('@Startup.appSettings["ApiDomain"]/SiteMap/Delete',
+                    fetch('/SiteMap/Delete',
                         {
-                            method: 'POST',
+                        method: 'PUT',
                             body: jsondata,
-                            headers: AWUtil.headers('json')
+                        headers: { 'Content-Type': 'application/json;' }
                         })
                         .then(response => response.json())
                         .then(function (data) {
@@ -200,21 +202,23 @@
                             //setTimeout(function () { location.reload(); }, 500);
                         })
                         .catch(error => console.error('Error:', error));
-                    </text>
+                @*</text>
                 }
-                @if (TempData["C"].ToString() == "Y") { 
-                    <text>
+                @if (TempData["C"].ToString() == "Y") {
+                <text>*@
                     }).on('create_node.jstree', function (e, data) {
                         //console.log(data);
                         var jsonnode = $.extend({ 'id': data.node.id }, { 'name': data.node.text }, { 'parent': data.node.parent }, { 'depth': data.node.parents.length });
                         var jsondata = JSON.stringify(jsonnode);
                         console.log(jsondata);
 
-                        fetch('@Startup.appSettings["ApiDomain"]/SiteMap/AddOrUpdate',
+                    if (data.node.parent != '#')
+                    {
+                        fetch('/SiteMap/AddOrUpdate',
                         {
-                            method: 'POST',
+                            method: 'PUT',
                             body: jsondata,
-                            headers: AWUtil.headers('json')
+                            headers: { 'Content-Type': 'application/json;' }
                         })
                         .then(response => response.json())
                         .then(function (data) {
@@ -225,32 +229,34 @@
                             }
                             //setTimeout(function () { location.reload(); }, 500);
                         })
-                        .catch(error => console.error('Error:', error));
-                    </text>
-                }
+                            .catch(error => console.error('Error:', error));
+                    }                
+            //    </text>
+            //}
                 });
         })
         .catch(error => console.error('Error:', error));
         //$.jstree.defaults.dnd.large_drag_target;
         //최상위 노드 추가
-        @if (TempData["C"].ToString() == "Y")
+        @*@if (TempData["C"].ToString() == "Y")
         {
-            <text>
+            <text>*@
             $('#AddRootbtn').click(function () {
                 $('#tree').jstree().create_node(null, null, 'last', function (node) {
-                    var data = JSON.stringify(node);
-                    //console.log(node);
+                    var object = { 'name': node.text };
+                    var data = JSON.stringify(object);
+                    console.log(data);
 
-                    fetch('@Startup.appSettings["ApiDomain"]/SiteMap/AddRootNode',
+                    fetch('/SiteMap/CreateRootNode',
                     {
                         method: 'POST',
                         body: data,
-                        headers: AWUtil.headers('json')
+                        headers: { 'Content-Type': 'application/json;' }
                     })
                     .then(response => response.json())
                     .then(function (data) {
                         //console.log(data);
-                        if (data.result == 'true') {
+                        if (data == true) {
                             Swal.fire('저장에 성공했습니다.');
                         } else {
                             Swal.fire('저장에 실패했습니다.');
@@ -260,12 +266,12 @@
                     .catch(error => console.error('Error:', error));
                 });
             });
-            </text>
-        }
+        //    </text>
+        //}
         //메뉴상세 정보 저장
-        @if (TempData["U"].ToString() == "Y")
+        @*@if (TempData["U"].ToString() == "Y")
         {
-            <text>
+            <text>*@
             $('#savebtn').click(function (event) {
                 var valiElement = $('#js-site')
 
@@ -280,17 +286,17 @@
 
                 return false;
             });
-            </text>
+            @*</text>
         }
 
         @if (TempData["D"].ToString() == "Y")
         {
-            <text>
+            <text>*@
             $('#deletebtn').click(function (event) {
                 $('#tree').jstree(true).delete_node($('#Id').val());
             });
-            </text>
-        }
+        //    </text>
+        //}
     });
 
     function SiteMapInfoSend() {
@@ -307,17 +313,15 @@
         var data = JSON.stringify(object);
 
         //노드정보 저장 API
-        fetch('@Startup.appSettings["ApiDomain"]/SiteMap/SiteMapInfo',
+        fetch('/SiteMap/UpdateSiteMapInfo',
         {
-            method: 'POST',
+            method: 'PUT',
             body: data,
-            headers: AWUtil.headers('json')
+            headers: { 'Content-Type': 'application/json;' }
         })
         .then(response => response.json())
         .then(function (data) {
-            //console.log(data);
-
-            if (data.result == 'true') {
+            if (data == true) {
                 Swal.fire('저장에 성공했습니다.');
             $('#tree').jstree(true).refresh();
             } else {
@@ -327,7 +331,7 @@
         })
         .catch(error => console.error('Error:', error));
     }
-    </script>*@
+    </script>
 }
 
 <div class="row">
@@ -341,14 +345,14 @@
             <div class="col-xl-12 ml-auto mr-auto mb-3 mt-3">
                 <div class="card p-4 rounded-plus bg-faded">
                     <div id="tree"></div>
-                    @if (TempData["C"].ToString() == "Y")
-                    {
-                        <div class="row no-gutters">
-                            <div class="col-md-4 text-left">
-                                <button id="AddRootbtn" type="submit" class="btn btn-info btn-sm mt-3"><i class="fal fa-plus mr-1"></i>최상위 노드 추가</button>
-                            </div>
+                    @*@if (TempData["C"].ToString() == "Y")
+                        {*@
+                    <div class="row no-gutters">
+                        <div class="col-md-4 text-left">
+                            <button id="AddRootbtn" type="button" class="btn btn-info btn-sm mt-3"><i class="fal fa-plus mr-1"></i>최상위 노드 추가</button>
                         </div>
-                    }
+                    </div>
+                    @*}*@
                 </div>
             </div>
         </div>
@@ -386,14 +390,14 @@
                         </div>
                         <div class="row no-gutters">
                             <div class="col-md-4 text-left">
-                                @if (TempData["U"].ToString() == "Y")
-                                {
-                                    <button id="savebtn" type="submit" class="btn btn-info btn-sm mt-3">저장</button>
-                                }
-                                @if (TempData["D"].ToString() == "Y")
-                                {
-                                    <button id="deletebtn" type="submit" class="btn btn-info btn-sm mt-3">삭제</button>
-                                }
+                                @*@if (TempData["U"].ToString() == "Y")
+                                    {*@
+                                <button id="savebtn" type="submit" class="btn btn-info btn-sm mt-3">저장</button>
+                                @*}
+                                    @if (TempData["D"].ToString() == "Y")
+                                        {*@
+                                <button id="deletebtn" type="submit" class="btn btn-info btn-sm mt-3">삭제</button>
+                                @*}*@
                             </div>
                         </div>
                     </form>

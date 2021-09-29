@@ -82,20 +82,5 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Services
             var response = await _httpClient.PostAsync(uri, data);
 
         }
-
-        public async Task<List<tbl_SiteMap>> GetSiteMap(long memberId, IEnumerable<long> roleIds)
-        {
-            var uri = API.Member.GetSiteMap(_apiBaseUrl);
-            _logger.LogDebug("[GetSiteMap] -> Calling {Uri} to get the member", uri);
-            var response = await _httpClient.GetAsync(uri);
-            _logger.LogDebug("[GetSiteMap] -> response code {StatusCode}", response.StatusCode);
-            var responseString = await response.Content.ReadAsStringAsync();
-
-            return string.IsNullOrEmpty(responseString) ?
-                null :
-                JsonConvert.DeserializeObject<List<tbl_SiteMap>>(responseString);
-
-            throw new NotImplementedException();
-        }
     }
 }

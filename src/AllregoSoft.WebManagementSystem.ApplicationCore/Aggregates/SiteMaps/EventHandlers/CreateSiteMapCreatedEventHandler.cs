@@ -2,26 +2,22 @@
 using AllregoSoft.WebManagementSystem.Domain.Events;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace AllregoSoft.WebManagementSystem.ApplicationCore.Aggregates.SiteMaps.EventHandlers
 {
-    public class SiteMapCompletedEventHandler : INotificationHandler<DomainEventNotification<SiteMapCompletedEvent>>
+    public class CreateSiteMapCreatedEventHandler : INotificationHandler<DomainEventNotification<CreateSiteMapCreatedEvent>>
     {
-        private ILogger<SiteMapCompletedEventHandler> _logger;
-        public SiteMapCompletedEventHandler(ILogger<SiteMapCompletedEventHandler> logger)
+        private readonly ILogger<CreateSiteMapCreatedEventHandler> _logger;
+        public CreateSiteMapCreatedEventHandler(ILogger<CreateSiteMapCreatedEventHandler> logger)
         {
             _logger = logger;
         }
-        public Task Handle(DomainEventNotification<SiteMapCompletedEvent> notification, CancellationToken cancellationToken)
+        public Task Handle(DomainEventNotification<CreateSiteMapCreatedEvent> notification, CancellationToken cancellationToken)
         {
             var domainEvent = notification.DomainEvent;
-
+            
             _logger.LogInformation("AWMS Domain Event: {DomainEvent}", domainEvent.GetType().Name);
 
             return Task.CompletedTask;

@@ -13,7 +13,6 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Infrastructure
             public static string GetMemberByIdentity(string baseUri, string identityId) => $"{baseUri}/GetMemberByIdAsync/{identityId}";
             public static string CreateMember(string baseUri) => $"{baseUri}/Create";
             public static string CreateAuthentication(string identityUri) => $"{identityUri}/api/auth/create";
-            public static string GetSiteMap(string baseUri) => $"{baseUri}/GetSiteMapAsync";
         }
 
         public static class ScmMember
@@ -25,9 +24,12 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Infrastructure
 
         public static class SiteMap
         {
-            public static string GetSiteMap(string baseUri, long RoleId) => $"{baseUri}/GetSiteMap?roleId={RoleId}";
-            //public static string GetScmMemberByIdentity(string baseUri, string identityId) => $"{baseUri}/GetMemberByIdAsync/{identityId}";
-            //public static string CreateScmMember(string baseUri) => $"{baseUri}/Create";
+            public static string GetRoleSiteMap(string baseUri, long RoleId) => $"{baseUri}/GetRoleSiteMap?roleId={RoleId}";
+            public static string SiteMapList(string baseUri) => $"{baseUri}/SiteMapList";
+            public static string SiteMapInfo(string baseUri, long Id) => $"{baseUri}/SiteMapInfo?Id={Id}";
+            public static string UpdateSiteMapInfo(string baseUri) => $"{baseUri}/UpdateSiteMapInfo";
+            public static string CreateRootNode(string baseUri) => $"{baseUri}/CreateRootNode";
+            public static string ChangePosition(string baseUri) => $"{baseUri}/ChangePosition";
         }
     }
 }

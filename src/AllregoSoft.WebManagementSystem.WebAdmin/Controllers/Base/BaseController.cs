@@ -29,6 +29,7 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Controllers
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             Prepare();
+            SetActive(context.HttpContext.Request.Path);
             base.OnActionExecuting(context);
         }
 
@@ -71,12 +72,72 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Controllers
                 SessionHelper.ScmMember = member;
             }
 
-            var SiteMap = _siteMapService.GetSiteMap(roleId).GetAwaiter().GetResult();
+            var SiteMap = _siteMapService.GetRoleSiteMap(roleId).GetAwaiter().GetResult();
 
-            if (SessionHelper.SiteMaps == null)
+            if (SessionHelper.SiteMaps == null || SessionHelper.SiteMaps.Count == 0)
             {
                 SessionHelper.SiteMaps = SiteMap;
             }
+        }
+
+        public void SetActive(string Path)
+        {
+            string strFirst = string.Empty;
+            string strSecond = string.Empty;
+
+            var SiteMapList = SessionHelper.SiteMaps;
+
+            foreach (var FirstMap in SiteMapList)
+            {
+                foreach (var SecondMap in FirstMap.ChildMaps)
+                {
+                    if (SecondMap.ChildMaps.Count == 0)
+                    {
+                        if (SecondMap.Path == Path)
+                        {
+                            strSecond = SecondMap.Parent.ToString();
+                            SecondMap.Clicked = true;
+                            FirstMap.Clicked = true;
+                        }
+                        else
+                        {
+                            SecondMap.Clicked = false;
+
+                            if (SecondMap.Parent.ToString() != strSecond && string.IsNullOrEmpty(strFirst))
+                                FirstMap.Clicked = false;
+                        }
+                    }
+                    else
+                    {
+                        foreach (var ThirdMap in SecondMap.ChildMaps)
+                        {
+                            if (ThirdMap.Path == Path)
+                            {
+                                strSecond = ThirdMap.Parent.ToString();
+                                strFirst = SecondMap.Parent.ToString();
+                                ThirdMap.Clicked = true;
+                                SecondMap.Clicked = true;
+                                FirstMap.Clicked = true;
+                            }
+                            else
+                            {
+                                ThirdMap.Clicked = false;
+
+                                if (SecondMap.Id.ToString() != strSecond)
+                                {
+                                    SecondMap.Clicked = false;
+
+                                    if (FirstMap.Id.ToString() != strFirst)
+                                    {
+                                        FirstMap.Clicked = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            SessionHelper.SiteMaps = SiteMapList;
         }
     }
 }

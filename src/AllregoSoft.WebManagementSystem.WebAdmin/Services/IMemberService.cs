@@ -12,6 +12,5 @@ namespace AllregoSoft.WebManagementSystem.WebAdmin.Services
         Task<tbl_Member> GetMemberByIdentity(string id);
         Task<string> CreateAuthentication(RegisterViewModel model);
         Task CreateMember(CreateMemberCommand command);
-        Task<List<tbl_SiteMap>> GetSiteMap(long memberId, IEnumerable<long> roleIds);
     }
 }
